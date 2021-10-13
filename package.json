@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@docus/app": "npm:@docus/app-edge",
-    "@docus/debug-theme": "^1.0.8",
+    "@docus/debug-theme": "^1.1.2",
     "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/jest": "^27.0.2",
