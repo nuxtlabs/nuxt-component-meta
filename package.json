@@ -27,7 +27,8 @@
     "clean:example": "rm -rf example/.nuxt example/node_modules",
     "clean:app": "rm -rf src/app/node_modules src/app/.nuxt",
     "clean:dist": "rm -rf dist node_modules",
-    "clean": "yarn clean:example && yarn clean:app && yarn clean:dist"
+    "clean": "yarn clean:example && yarn clean:app && yarn clean:dist",
+    "release": "yarn standard-version && git push --follow-tags origin main && npm publish"
   },
   "dependencies": {
     "@nuxt/kit": "npm:@nuxt/kit-edge",
