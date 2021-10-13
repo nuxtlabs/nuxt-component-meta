@@ -1,6 +1,6 @@
 import { pascalCase } from 'scule'
 // @ts-ignore
-import { components as _components } from '#build/component-meta'
+import { components as _components } from '#build/component-meta.mjs'
 
 export interface ComponentPropMeta {
   name: string

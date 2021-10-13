@@ -10,12 +10,12 @@
   "repository": "https://github.com/farnabaz/nuxt-component-meta",
   "license": "MIT",
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": "./dist/runtime.mjs",
     "./module": "./dist/module.mjs"
   },
-  "module": "./dist/index.mjs",
-  "main": "./dist/index.mjs",
-  "types": "./dist/index.ts",
+  "module": "./dist/runtime.mjs",
+  "main": "./dist/runtime.mjs",
+  "types": "./dist/runtime.d.ts",
   "files": [
     "dist"
   ],

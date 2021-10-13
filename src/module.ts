@@ -30,7 +30,7 @@ export default defineNuxtModule({
       )
 
       addTemplate({
-        filename: 'component-meta',
+        filename: 'component-meta.mjs',
         getContents: () => template(_components)
       })
     })
