@@ -1,6 +1,7 @@
 import { addTemplate, defineNuxtModule, Nuxt } from '@nuxt/kit'
 import { parse } from 'vue-docgen-api'
 import { runtimeDir } from './dirs'
+import template from './template'
 
 export default defineNuxtModule({
   setup(_options, nuxt: Nuxt) {
@@ -24,15 +25,7 @@ export default defineNuxtModule({
 
       addTemplate({
         filename: 'component-meta',
-        getContents() {
-          return `import { pascalCase } from 'scule'
-
-export const components = ${JSON.stringify(_components)}
-export const getComponent = name => {
-  name = pascalCase(name)
-  return components.find(c => c.name === name)
-}`
-        }
+        getContents: () => template(_components)
       })
     })
   }
