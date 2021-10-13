@@ -12,11 +12,16 @@ export default defineNuxtModule({
           const data = await parse(component.filePath)
           return {
             name: component.pascalName,
+            description: data.description,
+            slots: data.slots,
             props: (data.props || []).map(prop => {
               return {
                 key: prop.name,
                 default: prop.defaultValue ? prop.defaultValue.value : undefined,
-                type: prop.type ? prop.type.name : undefined
+                type: prop.type ? prop.type.name : undefined,
+                required: prop.required,
+                values: prop.values,
+                description: prop.description
               }
             })
           }
