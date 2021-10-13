@@ -15,11 +15,11 @@ yarn add --dev nuxt-component-meta
 npm install --save-dev nuxt-component-meta
 ```
 
-2. Add `nuxt-component-meta` to the `buildModules` section of your `nuxt.config.js`
+2. Add `nuxt-component-meta/module` to the `buildModules` section of your `nuxt.config.js`
 
 ```ts
 {
-  buildModules: ['nuxt-component-meta']
+  buildModules: ['nuxt-component-meta/module']
 }
 ```
 
@@ -36,7 +36,7 @@ npm install --save-dev nuxt-component-meta
 </template>
 
 <script>
-import { getComponent } from '#component-meta'
+import { getComponent } from 'nuxt-component-meta'
 
 export default {
   data() {

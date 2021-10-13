@@ -1,5 +1,6 @@
-import { addTemplate, defineNuxtModule, Nuxt } from '@nuxt/kit'
+import { addTemplate, defineNuxtModule } from '@nuxt/kit'
 import { parse } from 'vue-docgen-api'
+import type { Nuxt } from '@nuxt/kit'
 import { runtimeDir } from './dirs'
 import template from './template'
 
