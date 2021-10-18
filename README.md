@@ -30,7 +30,7 @@ npm install --save-dev nuxt-component-meta
   <div>
     <h2>`MyComponent` metadata</h2>
     <pre>
-      {{ component }}
+      {{ meta }}
     </pre>
   </div>
 </template>
