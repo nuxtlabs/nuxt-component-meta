@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@docus/app": "npm:@docus/app-edge",
-    "@docus/debug-theme": "^1.1.2",
+    "@docus/debug-theme": "^1.1.4",
     "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
     "@types/jest": "^27.0.2",
@@ -47,11 +47,11 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-nuxt": "^2.0.0",
     "eslint-plugin-prettier": "^3.4.1",
-    "jest": "^27.2.5",
-    "playwright": "^1.15.2",
+    "jest": "^27.3.1",
+    "playwright": "^1.16.3",
     "prettier": "^2.4.1",
-    "standard-version": "^9.3.1",
-    "ts-jest": "^27.0.5",
-    "unbuild": "^0.5.6"
+    "standard-version": "^9.3.2",
+    "ts-jest": "^27.0.7",
+    "unbuild": "^0.5.11"
   }
 }
