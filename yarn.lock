@@ -1041,12 +1041,11 @@
     unstorage "^0.2.9"
     ws "^8.2.3"
 
-"@docus/debug-theme@^1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@docus/debug-theme/-/debug-theme-1.1.4.tgz#1cfa73ad46ace58f246e8c6e23ec70590c2c59cf"
-  integrity sha512-SWtDjH7kSwLRyvhlg4Wlcu5JqZXAt9ZlKQmFimxLLYdkq9ivZsEOLWRK5RU0HvV7dU/s4ZXc4Hq7igXdQK+8Lw==
+"@docus/debug-theme@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@docus/debug-theme/-/debug-theme-1.2.0.tgz#9637e5164de9dc4e4910aaf52b257a8ab0390e69"
+  integrity sha512-qLXMAE93rqvKCgpnOXjY/PRiRb8aO/Piy05N7voE9GUo7p2I+WwJulcp5VpjO/AVGPU2Q9j7NPZjzkWVqTfMeg==
   dependencies:
-    "@nuxt/kit" "npm:@nuxt/kit-edge@latest"
     "@nuxtjs/color-mode" "^2.1.1"
 
 "@docus/mdc@npm:@docus/mdc-edge@latest":
