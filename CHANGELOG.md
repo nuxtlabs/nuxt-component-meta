@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.4](https://github.com/farnabaz/nuxt-component-meta/compare/v0.0.3...v0.0.4) (2021-11-09)
+
+
+### Bug Fixes
+
+* handle parse error ([b942424](https://github.com/farnabaz/nuxt-component-meta/commit/b942424f78e31d89a8b509a28d8aa8145049c35d))
+
 ### [0.0.3](https://github.com/farnabaz/nuxt-component-meta/compare/v0.0.2...v0.0.3) (2021-10-13)
 
 
