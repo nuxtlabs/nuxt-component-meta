@@ -10,7 +10,14 @@ export default defineNuxtModule({
     nuxt.hook('components:extend', async (components: any[]) => {
       const _components = await Promise.all(
         components.map(async (component: any) => {
-          const data = await parse(component.filePath)
+          let data
+          try {
+            data = await parse(component.filePath)
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error(`Cannot parse "${component.pascalName}".`, e)
+            data = {}
+          }
           return {
             name: component.pascalName,
             description: data.description,

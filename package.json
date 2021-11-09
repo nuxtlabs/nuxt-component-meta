@@ -31,7 +31,7 @@
     "release": "yarn standard-version && git push --follow-tags origin main && npm publish"
   },
   "dependencies": {
-    "@nuxt/kit": "npm:@nuxt/kit-edge",
+    "@nuxt/kit": "npm:@nuxt/kit-edge@latest",
     "pathe": "^0.2.0",
     "scule": "^0.2.1",
     "vue-docgen-api": "^4.41.2"
