@@ -1,3 +1,4 @@
 
 ## `<MyComponent>`
-:my-props{name="MyComponent"}
+
+:my-meta{of="MyComponent"}
