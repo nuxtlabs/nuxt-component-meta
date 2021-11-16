@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.5](https://github.com/farnabaz/nuxt-component-meta/compare/v0.0.4...v0.0.5) (2021-11-16)
+
+
+### Features
+
+* add module parser options ([#14](https://github.com/farnabaz/nuxt-component-meta/issues/14)) ([e8cd5d3](https://github.com/farnabaz/nuxt-component-meta/commit/e8cd5d36f04576a18ec725b7461b4f3e03944050))
+
 ### [0.0.4](https://github.com/farnabaz/nuxt-component-meta/compare/v0.0.3...v0.0.4) (2021-11-09)
 
 
