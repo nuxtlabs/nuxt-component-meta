@@ -4,15 +4,20 @@ import type { Nuxt } from '@nuxt/kit'
 import { runtimeDir } from './dirs'
 import template from './template'
 
-export default defineNuxtModule({
-  setup(_options, nuxt: Nuxt) {
+export interface Options {
+  parserOptions?: Parameters<typeof parse>[1]
+}
+
+export default defineNuxtModule<Options>({
+  configKey: 'componentMeta',
+  setup({ parserOptions }, nuxt: Nuxt) {
     nuxt.options.alias['#component-meta'] = runtimeDir
     nuxt.hook('components:extend', async (components: any[]) => {
       const _components = await Promise.all(
         components.map(async (component: any) => {
           let data
           try {
-            data = await parse(component.filePath)
+            data = await parse(component.filePath, parserOptions)
           } catch (e) {
             // eslint-disable-next-line no-console
             console.error(`Cannot parse "${component.pascalName}".`, e)
