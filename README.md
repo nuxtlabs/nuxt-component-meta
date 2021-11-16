@@ -48,6 +48,19 @@ export default {
 </script>
 ```
 
+## Options
+You can configure how component's meta is parsed by giving custom parser options:
+
+```ts
+{
+  buildModules: ['nuxt-component-meta/module'],
+  componentMeta: {
+    parserOptions: {
+      // See https://vue-styleguidist.github.io/docs/Docgen.html#options-docgenoptions
+    }
+  }
+}
+```
 ## Development
 
 1. Clone this repository
