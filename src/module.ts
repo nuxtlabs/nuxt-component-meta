@@ -1,4 +1,4 @@
-import { addTemplate, defineNuxtModule } from '@nuxt/kit'
+import { addTemplate, defineNuxtModule, resolveModule } from '@nuxt/kit'
 import { parse } from 'vue-docgen-api'
 import type { Nuxt } from '@nuxt/kit'
 import { runtimeDir } from './dirs'
@@ -17,7 +17,9 @@ export default defineNuxtModule<Options>({
         components.map(async (component: any) => {
           let data
           try {
-            data = await parse(component.filePath, parserOptions)
+            // resolve component path, auto detect extension if not specified
+            const path = resolveModule(component.filePath, { paths: nuxt.options.rootDir })
+            data = await parse(path, parserOptions)
           } catch (e) {
             // eslint-disable-next-line no-console
             console.error(`Cannot parse "${component.pascalName}".`, e)
