@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.7](https://github.com/farnabaz/nuxt-component-meta/compare/v0.0.6...v0.0.7) (2021-11-22)
+
+
+### Bug Fixes
+
+* build ([eb8f884](https://github.com/farnabaz/nuxt-component-meta/commit/eb8f88488889a153dbeb46e1145ac773a6afc511))
+* ESM distDir detection ([d444cf5](https://github.com/farnabaz/nuxt-component-meta/commit/d444cf52106abf5862f051d9744a6e05dd4b9a51))
+
 ### [0.0.6](https://github.com/farnabaz/nuxt-component-meta/compare/v0.0.5...v0.0.6) (2021-11-22)
 
 
