@@ -1,6 +1,5 @@
 import { addTemplate, defineNuxtModule, resolveModule } from '@nuxt/kit'
 import { parse } from 'vue-docgen-api'
-import type { Nuxt } from '@nuxt/kit'
 import { runtimeDir } from './dirs'
 import template from './template'
 
@@ -10,7 +9,7 @@ export interface Options {
 
 export default defineNuxtModule<Options>({
   configKey: 'componentMeta',
-  setup({ parserOptions }, nuxt: Nuxt) {
+  setup({ parserOptions }, nuxt) {
     nuxt.options.alias['#component-meta'] = runtimeDir
     nuxt.hook('components:extend', async (components: any[]) => {
       const _components = await Promise.all(
