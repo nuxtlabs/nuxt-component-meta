@@ -1,6 +1,6 @@
 {
   "name": "nuxt-component-meta",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -20,7 +20,8 @@
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
     "lint": "eslint --ext .js,.ts,.vue .",
-    "test": "vitest"
+    "test": "vitest",
+    "release": "yarn test && standard-version && git push --follow-tags && npm publish"
   },
   "dependencies": {
     "@nuxt/kit": "npm:@nuxt/kit-edge@latest",
@@ -33,6 +34,7 @@
     "@nuxtjs/eslint-config-typescript": "latest",
     "eslint": "latest",
     "nuxt3": "latest",
+    "standard-version": "^9.3.2",
     "vitest": "^0.9.3"
   }
 }
