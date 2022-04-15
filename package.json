@@ -34,24 +34,24 @@
     "@nuxt/kit": "npm:@nuxt/kit-edge@latest",
     "pathe": "^0.2.0",
     "scule": "^0.2.1",
-    "vue-docgen-api": "^4.41.2"
+    "vue-docgen-api": "^4.44.23"
   },
   "devDependencies": {
     "@docus/app": "npm:@docus/app-edge",
     "@docus/debug-theme": "^1.2.0",
     "@nuxt/test-utils": "latest",
     "@nuxtjs/eslint-config-typescript": "latest",
-    "@types/jest": "^27.0.2",
+    "@types/jest": "^27.4.1",
     "babel-eslint": "latest",
-    "eslint": "^8.2.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-nuxt": "^3.0.0",
+    "eslint": "^8.13.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-nuxt": "^3.2.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "jest": "^27.3.1",
-    "playwright": "^1.16.3",
-    "prettier": "^2.4.1",
+    "jest": "^27.5.1",
+    "playwright": "^1.21.0",
+    "prettier": "^2.6.2",
     "standard-version": "^9.3.2",
-    "ts-jest": "^27.0.7",
-    "unbuild": "^0.5.11"
+    "ts-jest": "^27.1.4",
+    "unbuild": "^0.7.4"
   }
 }
