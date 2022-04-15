@@ -1,12 +1,12 @@
 import { defineEventHandler, createError } from 'h3'
 import { pascalCase } from 'scule'
-import { useRuntimeConfig } from '#nitro'
+import { components } from '#meta/virtual/meta'
 
 export default defineEventHandler((event) => {
   const componentName = event.context.params.component
-  const componentMeta = useRuntimeConfig().componentMeta || []
+
   if (componentName) {
-    const meta = componentMeta.find(c => c.name === pascalCase(componentName))
+    const meta = components.find(c => c.name === pascalCase(componentName))
     if (!meta) {
       throw createError({
         statusMessage: 'Components not found!',
@@ -20,5 +20,5 @@ export default defineEventHandler((event) => {
     return meta
   }
 
-  return componentMeta
+  return components
 })

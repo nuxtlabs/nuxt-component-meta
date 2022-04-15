@@ -1,9 +1,9 @@
-import { resolve } from 'path'
 import { fileURLToPath } from 'url'
 import fsp from 'fs/promises'
 import { defineNuxtModule, addPlugin, resolveModule, addServerMiddleware } from '@nuxt/kit'
 import { parse, compileScript, compileTemplate } from '@vue/compiler-sfc'
 import type { SFCDescriptor } from '@vue/compiler-sfc'
+import type { Nitro } from 'nitropack'
 
 export interface ModuleOptions {
   addPlugin: boolean
@@ -20,33 +20,38 @@ export default defineNuxtModule<ModuleOptions>({
   setup (options, nuxt) {
     if (options.addPlugin) {
       const runtimeDir = fileURLToPath(new URL('./runtime', import.meta.url))
-
+      let nitro: Nitro
       nuxt.hook('components:extend', async (components) => {
-        const componentMeta = await components.map(async (component) => {
-          const name = (component as any).pascalName
-          const path = resolveModule((component as any).filePath, { paths: nuxt.options.rootDir })
-          const source = await fsp.readFile(path, { encoding: 'utf-8' })
+        const componentMeta = await Promise.all(
+          components.map(async (component) => {
+            const name = (component as any).pascalName
+            const path = resolveModule((component as any).filePath, { paths: nuxt.options.rootDir })
+            const source = await fsp.readFile(path, { encoding: 'utf-8' })
 
-          // Parse component source
-          const { descriptor } = parse(source)
+            // Parse component source
+            const { descriptor } = parse(source)
 
-          // Parse script
-          const { props } = descriptor.scriptSetup
-            ? parseSetupScript(name, descriptor)
-            : {
-                props: {}
-              }
+            // Parse script
+            const { props } = descriptor.scriptSetup
+              ? parseSetupScript(name, descriptor)
+              : {
+                  props: {}
+                }
 
-          const { slots } = parseTemplate(name, descriptor)
+            const { slots } = parseTemplate(name, descriptor)
 
-          return {
-            name,
-            props,
-            slots
-          }
-        })
-        // Inject meta information into runtimeConfig
-        nuxt.options.runtimeConfig.componentMeta = componentMeta
+            return {
+              name,
+              props,
+              slots
+            }
+          })
+        )
+        nitro.options.virtual['#meta/virtual/meta'] = `export const components = ${JSON.stringify(componentMeta)}`
+      })
+
+      nuxt.hook('nitro:init', (_nitro) => {
+        nitro = _nitro
       })
 
       addServerMiddleware({
@@ -54,7 +59,7 @@ export default defineNuxtModule<ModuleOptions>({
         handler: resolveModule('./server/api/component-meta.get', { paths: runtimeDir })
       })
       addServerMiddleware({
-        route: '/api/component-meta/:component',
+        route: '/api/component-meta/:component?',
         handler: resolveModule('./server/api/component-meta.get', { paths: runtimeDir })
       })
     }
