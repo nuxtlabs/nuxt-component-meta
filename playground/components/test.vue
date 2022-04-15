@@ -1,7 +1,7 @@
 <template>
   <div>
     <slot />
-    <hr/>
+    <hr>
     <slot name="nuxt" />
   </div>
 </template>
