@@ -2,7 +2,7 @@
 
 > Gather components metadata on build time and make them available on production
 
-💡 This module depends on `@nuxt/bridge`
+💡 This module depends on `nuxt3`
 
 ## Quick Setup
 
@@ -15,11 +15,11 @@ yarn add --dev nuxt-component-meta
 npm install --save-dev nuxt-component-meta
 ```
 
-2. Add `nuxt-component-meta/module` to the `buildModules` section of your `nuxt.config.js`
+2. Add `nuxt-component-meta` to the `modules` section of your `nuxt.config.js`
 
 ```ts
 {
-  buildModules: ['nuxt-component-meta/module']
+  modules: ['nuxt-component-meta']
 }
 ```
 
@@ -35,32 +35,11 @@ npm install --save-dev nuxt-component-meta
   </div>
 </template>
 
-<script>
-import { getComponent } from 'nuxt-component-meta'
-
-export default {
-  data() {
-    return {
-      meta: getComponent('my-component')
-    }
-  }
-}
+<script script>
+const { data: meta } = await useAsyncData('my-component', () => $fetch('/api/component-meta/my-component'))
 </script>
 ```
 
-## Options
-You can configure how component's meta is parsed by giving custom parser options:
-
-```ts
-{
-  buildModules: ['nuxt-component-meta/module'],
-  componentMeta: {
-    parserOptions: {
-      // See https://vue-styleguidist.github.io/docs/Docgen.html#options-docgenoptions
-    }
-  }
-}
-```
 ## Development
 
 1. Clone this repository
