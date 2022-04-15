@@ -35,7 +35,7 @@ export default defineNuxtModule<ModuleOptions>({
             const { props } = descriptor.scriptSetup
               ? parseSetupScript(name, descriptor)
               : {
-                  props: {}
+                  props: []
                 }
 
             const { slots } = parseTemplate(name, descriptor)
