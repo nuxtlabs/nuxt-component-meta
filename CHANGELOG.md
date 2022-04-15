@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.0.7...v0.1.0) (2022-04-15)
+
+
+### Features
+
+* support Vue3 ([#17](https://github.com/nuxtlabs/nuxt-component-meta/issues/17)) ([f52cf6d](https://github.com/nuxtlabs/nuxt-component-meta/commit/f52cf6de9afd5d6916b7d1803ebd5c438d0084e9))
+
 ### [0.0.7](https://github.com/farnabaz/nuxt-component-meta/compare/v0.0.6...v0.0.7) (2021-11-22)
 
 
