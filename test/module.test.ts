@@ -1,17 +1,28 @@
-import { resolve } from 'path'
-// @ts-ignore
-import { withDocus } from '@docus/app'
+import { fileURLToPath } from 'url'
+import { test, describe, expect } from 'vitest'
+import { setup, $fetch } from '@nuxt/test-utils'
 
-describe('module', () => {
-  const docus = withDocus(resolve(__dirname, './fixtures/theme.js'), {})
-
-  test('withDocus should return NuxtConfig', () => {
-    expect(docus).toBeInstanceOf(Object)
+describe('fixtures:basic', async () => {
+  await setup({
+    rootDir: fileURLToPath(new URL('./fixtures/basic', import.meta.url)),
+    server: true
   })
 
-  test('withDocus should return NuxtConfig extending theme', () => {
-    expect(docus).toBeInstanceOf(Object)
-    expect(docus).toHaveProperty('themeDir')
-    expect(docus.themeDir).toEqual(resolve(__dirname, './fixtures'))
+  test('List components', async () => {
+    const components = await $fetch('/api/component-meta')
+    expect(components.length).greaterThan(0)
+
+    components.forEach((component) => {
+      expect(component).ownProperty('name')
+      expect(component).ownProperty('props')
+      expect(Array.isArray(component.props)).toBeTruthy()
+      expect(component).ownProperty('slots')
+      expect(Array.isArray(component.slots)).toBeTruthy()
+    })
+
+    const testComponent = components.find(c => c.name === 'Test')
+    expect(testComponent.props).toMatchObject([{
+      name: 'hello'
+    }])
   })
 })

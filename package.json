@@ -1,57 +1,40 @@
 {
   "name": "nuxt-component-meta",
-  "version": "0.0.7",
-  "description": "Nuxt components metadata",
-  "keywords": [
-    "nuxt",
-    "component",
-    "metadata"
-  ],
-  "repository": "https://github.com/farnabaz/nuxt-component-meta",
+  "version": "0.1.0",
   "license": "MIT",
+  "type": "module",
   "exports": {
-    ".": "./dist/runtime.mjs",
-    "./module": "./dist/module.mjs"
+    ".": {
+      "import": "./dist/module.mjs",
+      "require": "./dist/module.cjs"
+    }
   },
-  "module": "./dist/runtime.mjs",
-  "main": "./dist/runtime.mjs",
-  "types": "./dist/runtime.d.ts",
+  "main": "./dist/module.cjs",
+  "types": "./dist/types.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "unbuild",
-    "dev": "nuxt dev example",
+    "prepack": "nuxt-module-build",
+    "dev": "nuxi dev playground",
+    "dev:build": "nuxi build playground",
+    "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
     "lint": "eslint --ext .js,.ts,.vue .",
-    "test": "yarn lint && jest",
-    "clean:example": "rm -rf example/.nuxt example/node_modules",
-    "clean:app": "rm -rf src/app/node_modules src/app/.nuxt",
-    "clean:dist": "rm -rf dist node_modules",
-    "clean": "yarn clean:example && yarn clean:app && yarn clean:dist",
-    "release": "yarn build && yarn standard-version && git push --follow-tags origin main && npm publish"
+    "test": "vitest",
+    "release": "yarn test && standard-version && git push --follow-tags && npm publish"
   },
   "dependencies": {
     "@nuxt/kit": "npm:@nuxt/kit-edge@latest",
-    "pathe": "^0.2.0",
-    "scule": "^0.2.1",
-    "vue-docgen-api": "^4.41.2"
+    "@vue/compiler-sfc": "^3.2.33",
+    "scule": "^0.2.1"
   },
   "devDependencies": {
-    "@docus/app": "npm:@docus/app-edge",
-    "@docus/debug-theme": "^1.2.0",
-    "@nuxt/test-utils": "latest",
+    "@nuxt/module-builder": "latest",
+    "@nuxt/test-utils": "npm:@nuxt/test-utils-edge@latest",
     "@nuxtjs/eslint-config-typescript": "latest",
-    "@types/jest": "^27.0.2",
-    "babel-eslint": "latest",
-    "eslint": "^8.2.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-nuxt": "^3.0.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "jest": "^27.3.1",
-    "playwright": "^1.16.3",
-    "prettier": "^2.4.1",
+    "eslint": "latest",
+    "nuxt3": "latest",
     "standard-version": "^9.3.2",
-    "ts-jest": "^27.0.7",
-    "unbuild": "^0.5.11"
+    "vitest": "^0.9.3"
   }
 }

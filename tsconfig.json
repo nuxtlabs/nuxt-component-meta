@@ -1,17 +1,3 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "strict": true,
-    "target": "esnext",
-    "module": "commonjs",
-    "lib": ["esnext", "dom"],
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "declaration": false,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "types": ["node", "jest"],
-    "allowJs": true
-  }
+  "extends": "./playground/.nuxt/tsconfig.json"
 }
