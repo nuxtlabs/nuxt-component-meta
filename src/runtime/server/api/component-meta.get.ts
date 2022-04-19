@@ -1,8 +1,11 @@
-import { defineEventHandler, createError } from 'h3'
+import { defineEventHandler, createError, appendHeader } from 'h3'
 import { pascalCase } from 'scule'
 import { components } from '#meta/virtual/meta'
 
 export default defineEventHandler((event) => {
+  // TODO: Replace via downstream config
+  appendHeader(event, 'Access-Control-Allow-Origin', '*')
+
   const componentName = event.context.params.component
 
   if (componentName) {
