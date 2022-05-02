@@ -68,14 +68,40 @@ export default defineNuxtModule<ModuleOptions>({
 
 function parseSetupScript (id: string, descriptor: SFCDescriptor) {
   const script = compileScript(descriptor, { id })
-  const props = Object.entries(script.bindings).filter(([_name, type]) => type === 'props').map(([name]) => ({
-    name,
-    default: '?',
-    type: '?',
-    required: '?',
-    values: '?',
-    description: '?'
-  }))
+
+  function getValue (prop) {
+    if (prop.type.endsWith('Literal')) {
+      return prop.value
+    }
+
+    if (prop.type === 'Identifier') {
+      return prop.name
+    }
+
+    if (prop.type === 'ObjectExpression') {
+      return prop.properties.reduce((acc, prop) => {
+        acc[prop.key.name] = getValue(prop.value)
+        return acc
+      }, {})
+    }
+  }
+  const props = []
+  visit(script.scriptSetupAst, node => node.type === 'CallExpression' && node.callee?.name === 'defineProps', (node) => {
+    const properties = node.arguments[0]?.properties || []
+    properties.reduce((props, p) => {
+      props.push({
+        name: p.key.name,
+        // default: '?',
+        // type: '?',
+        // required: '?',
+        // values: '?',
+        // description: '?',
+        ...getValue(p.value)
+      })
+      return props
+    }, props)
+  })
+
   return {
     props
   }
@@ -105,5 +131,38 @@ function parseTemplate (id: string, descriptor: SFCDescriptor) {
 
   return {
     slots: findSlots(template.ast?.children || [])
+  }
+}
+
+function visit (node, test, visitNode) {
+  if (Array.isArray(node)) {
+    return node.forEach(n => visit(n, test, visitNode))
+  }
+
+  if (!node.type) { return }
+
+  if (test(node)) {
+    visitNode(node)
+  }
+
+  switch (node.type) {
+    case 'VariableDeclaration':
+      visit(node.declarations, test, visitNode)
+      break
+    case 'VariableDeclarator':
+      visit(node.id, test, visitNode)
+      visit(node.init, test, visitNode)
+      break
+    case 'CallExpression':
+      visit(node.callee, test, visitNode)
+      visit(node.arguments, test, visitNode)
+      break
+    case 'ObjectExpression':
+      visit(node.properties, test, visitNode)
+      break
+    case 'ObjectProperty':
+      visit(node.key, test, visitNode)
+      visit(node.value, test, visitNode)
+      break
   }
 }
