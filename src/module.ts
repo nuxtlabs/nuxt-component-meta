@@ -85,6 +85,11 @@ function parseSetupScript (id: string, descriptor: SFCDescriptor) {
       }, {})
     }
   }
+  function getType (tsProperty) {
+    const { type } = tsProperty.typeAnnotation.typeAnnotation
+
+    return type.match(/TS(\w+)Keyword/)[1]
+  }
   const props = []
   visit(script.scriptSetupAst, node => node.type === 'CallExpression' && node.callee?.name === 'defineProps', (node) => {
     const properties = node.arguments[0]?.properties || []
@@ -100,6 +105,14 @@ function parseSetupScript (id: string, descriptor: SFCDescriptor) {
       })
       return props
     }, props)
+    visit(node, n => n.type === 'TSPropertySignature', (property) => {
+      const name = property.key.name
+      props.push({
+        name,
+        required: !property.optional,
+        type: getType(property)
+      })
+    })
   })
 
   return {
@@ -139,7 +152,7 @@ function visit (node, test, visitNode) {
     return node.forEach(n => visit(n, test, visitNode))
   }
 
-  if (!node.type) { return }
+  if (!node?.type) { return }
 
   if (test(node)) {
     visitNode(node)
@@ -156,6 +169,7 @@ function visit (node, test, visitNode) {
     case 'CallExpression':
       visit(node.callee, test, visitNode)
       visit(node.arguments, test, visitNode)
+      visit(node.typeParameters, test, visitNode)
       break
     case 'ObjectExpression':
       visit(node.properties, test, visitNode)
@@ -163,6 +177,12 @@ function visit (node, test, visitNode) {
     case 'ObjectProperty':
       visit(node.key, test, visitNode)
       visit(node.value, test, visitNode)
+      break
+    case 'TSTypeParameterInstantiation':
+      visit(node.params, test, visitNode)
+      break
+    case 'TSTypeLiteral':
+      visit(node.members, test, visitNode)
       break
   }
 }
