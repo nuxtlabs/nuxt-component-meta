@@ -1,6 +1,5 @@
-import { fileURLToPath } from 'url'
-import fsp from 'fs/promises'
-import { defineNuxtModule, resolveModule, createResolver } from '@nuxt/kit'
+import { readFile } from 'fs/promises'
+import { defineNuxtModule, resolveModule, createResolver, addServerHandler } from '@nuxt/kit'
 import { parse, compileScript, compileTemplate } from '@vue/compiler-sfc'
 import type { SFCDescriptor } from '@vue/compiler-sfc'
 
@@ -20,7 +19,7 @@ export default defineNuxtModule<ModuleOptions>({
         components.map(async (component) => {
           const name = (component as any).pascalName
           const path = resolveModule((component as any).filePath, { paths: nuxt.options.rootDir })
-          const source = await fsp.readFile(path, { encoding: 'utf-8' })
+          const source = await readFile(path, { encoding: 'utf-8' })
 
           // Parse component source
           const { descriptor } = parse(source)
@@ -48,16 +47,18 @@ export default defineNuxtModule<ModuleOptions>({
       nitroConfig.virtual = nitroConfig.virtual || {}
 
       nitroConfig.virtual['#meta/virtual/meta'] = () => `export const components = ${JSON.stringify(componentMeta)}`
+    })
 
-      nitroConfig.handlers.push({
-        route: '/api/component-meta',
-        handler: resolver.resolve('./runtime/server/api/component-meta.get')
-      })
+    addServerHandler({
+      method: 'get',
+      route: '/api/component-meta',
+      handler: resolver.resolve('./runtime/server/api/component-meta.get')
+    })
 
-      nitroConfig.handlers.push({
-        route: '/api/component-meta/:component?',
-        handler: resolver.resolve('./runtime/server/api/component-meta.get')
-      })
+    addServerHandler({
+      method: 'get',
+      route: '/api/component-meta/:component?',
+      handler: resolver.resolve('./runtime/server/api/component-meta.get')
     })
   }
 })
