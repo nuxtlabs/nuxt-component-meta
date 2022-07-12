@@ -1,5 +1,5 @@
-import { defineNuxtConfig } from 'nuxt3'
-import nuxtMetaModule from '..'
+import { defineNuxtConfig } from 'nuxt'
+import nuxtMetaModule from '../src/module'
 
 export default defineNuxtConfig({
   modules: [

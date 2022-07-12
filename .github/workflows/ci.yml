@@ -24,4 +24,5 @@ jobs:
       - run: yarn dev:prepare
       - run: yarn lint
       - run: yarn prepack
+      - run: yarn dev:generate
       - run: yarn test

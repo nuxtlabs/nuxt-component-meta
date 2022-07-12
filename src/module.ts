@@ -1,51 +1,47 @@
-import { fileURLToPath } from 'url'
-import fsp from 'fs/promises'
-import { defineNuxtModule, resolveModule, addServerMiddleware } from '@nuxt/kit'
-import type { Nitro } from 'nitropack'
+import { readFile } from 'fs/promises'
+import { defineNuxtModule, resolveModule, createResolver, addServerHandler } from '@nuxt/kit'
 import { parseComponent } from './utils/parse'
 
-export interface ModuleOptions {
-  addPlugin: boolean
-}
+export interface ModuleOptions {}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: 'nuxt-component-meta',
     configKey: 'componentMeta'
   },
-  defaults: {
-    addPlugin: true
-  },
-  setup (options, nuxt) {
-    if (options.addPlugin) {
-      const runtimeDir = fileURLToPath(new URL('./runtime', import.meta.url))
-      let nitro: Nitro
-      nuxt.hook('components:extend', async (components) => {
-        const componentMeta = await Promise.all(
-          components.map(async (component) => {
-            const name = (component as any).pascalName
-            const path = resolveModule((component as any).filePath, { paths: nuxt.options.rootDir })
-            const source = await fsp.readFile(path, { encoding: 'utf-8' })
+  setup (_options, nuxt) {
+    const resolver = createResolver(import.meta.url)
 
-            return parseComponent(name, source)
-          })
-        )
+    let componentMeta
+    nuxt.hook('components:extend', async (components) => {
+      componentMeta = await Promise.all(
+        components.map(async (component) => {
+          const name = (component as any).pascalName
+          const path = resolveModule((component as any).filePath, { paths: nuxt.options.rootDir })
+          const source = await readFile(path, { encoding: 'utf-8' })
 
-        nitro.options.virtual['#meta/virtual/meta'] = `export const components = ${JSON.stringify(componentMeta)}`
-      })
+          return parseComponent(name, source)
+        })
+      )
+    })
 
-      nuxt.hook('nitro:init', (_nitro) => {
-        nitro = _nitro
-      })
+    nuxt.hook('nitro:config', (nitroConfig) => {
+      nitroConfig.handlers = nitroConfig.handlers || []
+      nitroConfig.virtual = nitroConfig.virtual || {}
 
-      addServerMiddleware({
-        route: '/api/component-meta',
-        handler: resolveModule('./server/api/component-meta.get', { paths: runtimeDir })
-      })
-      addServerMiddleware({
-        route: '/api/component-meta/:component?',
-        handler: resolveModule('./server/api/component-meta.get', { paths: runtimeDir })
-      })
-    }
+      nitroConfig.virtual['#meta/virtual/meta'] = () => `export const components = ${JSON.stringify(componentMeta)}`
+    })
+
+    addServerHandler({
+      method: 'get',
+      route: '/api/component-meta',
+      handler: resolver.resolve('./runtime/server/api/component-meta.get')
+    })
+
+    addServerHandler({
+      method: 'get',
+      route: '/api/component-meta/:component?',
+      handler: resolver.resolve('./runtime/server/api/component-meta.get')
+    })
   }
 })

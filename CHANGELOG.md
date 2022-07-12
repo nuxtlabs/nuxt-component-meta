@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.5](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.2...v0.1.5) (2022-05-11)
+
+
+### Bug Fixes
+
+* **api:** fix single component query ([5f967c5](https://github.com/nuxtlabs/nuxt-component-meta/commit/5f967c5a4fc0a36b14b72ed37158e57ddc262770))
+* **lint:** fix linting ([237b16f](https://github.com/nuxtlabs/nuxt-component-meta/commit/237b16fd181528276818e7b1654ad6b3d7f57656))
+* use addServerHandler and correct method ([3d247cc](https://github.com/nuxtlabs/nuxt-component-meta/commit/3d247cc7983b951c463ceae15fa5819225241ef1))
+
 ### [0.1.2](https://github.com/farnabaz/nuxt-component-meta/compare/v0.1.0...v0.1.2) (2022-04-19)
 
 ## [0.1.0](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.0.7...v0.1.0) (2022-04-15)
