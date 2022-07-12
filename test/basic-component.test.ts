@@ -1,7 +1,7 @@
 import fsp from 'fs/promises'
 import { fileURLToPath } from 'url'
 import { test, describe, expect } from 'vitest'
-import { parseComponent } from '../src/utils/parse'
+import { parseComponent } from '../src/utils/parseComponent'
 
 describe('Basic Component', async () => {
   const path = fileURLToPath(new URL('./fixtures/basic/components/basic.vue', import.meta.url))

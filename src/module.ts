@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises'
 import { defineNuxtModule, resolveModule, createResolver, addServerHandler } from '@nuxt/kit'
-import { parseComponent } from './utils/parse'
+import { parseComponent } from './utils/parseComponent'
 
 export interface ModuleOptions {}
 

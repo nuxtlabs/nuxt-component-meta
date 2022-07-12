@@ -9,9 +9,7 @@ export function parseComponent (name: string, source: string) {
   // Parse script
   const { props } = descriptor.scriptSetup
     ? parseSetupScript(name, descriptor)
-    : {
-        props: []
-      }
+    : { props: [] }
 
   const { slots } = parseTemplate(name, descriptor)
 

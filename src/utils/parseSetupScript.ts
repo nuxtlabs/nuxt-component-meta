@@ -42,11 +42,6 @@ export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
     properties.reduce((props, p) => {
       props.push({
         name: p.key.name,
-        // default: '?',
-        // type: '?',
-        // required: '?',
-        // values: '?',
-        // description: '?',
         ...getValue(p.value)
       })
       return props
