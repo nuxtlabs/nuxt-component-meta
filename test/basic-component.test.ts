@@ -4,10 +4,10 @@ import { test, describe, expect } from 'vitest'
 import { parseComponent } from '../src/utils/parseComponent'
 
 describe('Basic Component', async () => {
-  const path = fileURLToPath(new URL('./fixtures/basic/components/basic.vue', import.meta.url))
+  const path = fileURLToPath(new URL('./fixtures/basic/components/BasicComponent.vue', import.meta.url))
   const source = await fsp.readFile(path, { encoding: 'utf-8' })
   // Parse component source
-  const { props, slots } = parseComponent('Basic', source)
+  const { props, slots } = parseComponent('BasicComponent', source)
 
   test('Slots', () => {
     expect(slots).toEqual([
