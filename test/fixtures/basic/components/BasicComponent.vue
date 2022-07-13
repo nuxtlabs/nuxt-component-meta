@@ -8,7 +8,7 @@
 
 <script setup>
 const props = defineProps({
-  hello: {
+  stringProp: {
     type: String,
     default: 'Hello'
   },
@@ -19,8 +19,15 @@ const props = defineProps({
   numberProp: {
     type: Number,
     default: 1.3
+  },
+  arrayProp: {
+    type: Array,
+    default: () => []
+  },
+  objectProp: {
+    type: Object,
+    default: () => ({})
   }
 })
 const emit = defineEmits(['change', 'delete'])
-
 </script>
