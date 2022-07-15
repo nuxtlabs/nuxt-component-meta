@@ -20,7 +20,13 @@ export default defineNuxtModule<ModuleOptions>({
           const path = resolveModule((component as any).filePath, { paths: nuxt.options.rootDir })
           const source = await readFile(path, { encoding: 'utf-8' })
 
-          return parseComponent(name, source)
+          const { props, slots } = parseComponent(name, source)
+          return {
+            name,
+            global: Boolean(component.global),
+            props,
+            slots
+          }
         })
       )
     })
