@@ -3,6 +3,8 @@
     <slot />
     <hr>
     <slot name="nuxt" />
+
+    <SomeComponent :prop="$slots.variable" />
   </div>
 </template>
 
