@@ -25,6 +25,9 @@ export function visit (node, test, visitNode) {
     case 'ObjectExpression':
       visit(node.properties, test, visitNode)
       break
+    case 'ExpressionStatement':
+      visit(node.expression, test, visitNode)
+      break
     case 'ObjectProperty':
       visit(node.key, test, visitNode)
       visit(node.value, test, visitNode)

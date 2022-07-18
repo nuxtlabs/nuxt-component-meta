@@ -24,7 +24,7 @@ export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
     }
   }
   function getType (tsProperty) {
-    const { type } = tsProperty.typeAnnotation.typeAnnotation
+    const { type, typeName, elementType } = tsProperty.typeAnnotation?.typeAnnotation || tsProperty
     switch (type) {
       case 'TSStringKeyword':
         return 'String'
@@ -34,6 +34,13 @@ export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
         return 'Boolean'
       case 'TSObjectKeyword':
         return 'Object'
+      case 'TSTypeReference':
+        return typeName.name
+      case 'TSArrayType':
+        return {
+          type: 'Array',
+          elementType: getType(elementType)
+        }
     }
   }
 
