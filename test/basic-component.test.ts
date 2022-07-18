@@ -12,6 +12,7 @@ describe('Basic Component', async () => {
   test('Slots', () => {
     expect(slots).toEqual([
       { name: 'variable' },
+      { name: 'foo-bar' },
       { name: 'default' },
       { name: 'nuxt' }
     ])
