@@ -8,6 +8,9 @@ export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
   const script = compileScript(descriptor, { id })
 
   function getValue (prop) {
+    if (!prop?.type) {
+      return undefined
+    }
     if (prop.type.endsWith('Literal')) {
       return prop.value
     }
