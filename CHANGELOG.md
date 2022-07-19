@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.6](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.5...v0.1.6) (2022-07-19)
+
+
+### Features
+
+* add flag for global components ([#27](https://github.com/nuxtlabs/nuxt-component-meta/issues/27)) ([6e70ad3](https://github.com/nuxtlabs/nuxt-component-meta/commit/6e70ad3bde35d5d04cbe8eaaf5cdff39b0186cf7))
+* basic support for typescript defineProps ([#25](https://github.com/nuxtlabs/nuxt-component-meta/issues/25)) ([60cfbaf](https://github.com/nuxtlabs/nuxt-component-meta/commit/60cfbaf86f339e00fda6e7474b75a99fe44c1943))
+* detect `$slots` usages in template ([#26](https://github.com/nuxtlabs/nuxt-component-meta/issues/26)) ([ec35351](https://github.com/nuxtlabs/nuxt-component-meta/commit/ec3535156e2297c92d45c9b31b8315f76734f5a1))
+* extract props info from `defineProps` ([#21](https://github.com/nuxtlabs/nuxt-component-meta/issues/21)) ([8f89275](https://github.com/nuxtlabs/nuxt-component-meta/commit/8f8927581e9067e8ac49782931065012634668bb))
+
 ### [0.1.5](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.2...v0.1.5) (2022-05-11)
 
 
