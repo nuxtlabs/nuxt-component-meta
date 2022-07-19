@@ -19,6 +19,7 @@ export default defineNuxtModule<ModuleOptions>({
           const name = (component as any).pascalName
           const path = resolveModule((component as any).filePath, { paths: nuxt.options.rootDir })
           const source = await readFile(path, { encoding: 'utf-8' })
+          const props = []
 
           const { props, slots } = parseComponent(name, source)
           return {
