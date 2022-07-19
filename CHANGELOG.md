@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.7](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.6...v0.1.7) (2022-07-19)
+
+
+### Bug Fixes
+
+* prevent `undefined` error ([5a403f4](https://github.com/nuxtlabs/nuxt-component-meta/commit/5a403f415f24c450a276e34b98f32040cf54719d))
+
 ### [0.1.6](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.5...v0.1.6) (2022-07-19)
 
 
