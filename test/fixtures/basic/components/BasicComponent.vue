@@ -9,7 +9,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { PropType } from 'vue'
+
 const props = defineProps({
   stringProp: {
     type: String,
@@ -26,6 +28,11 @@ const props = defineProps({
   arrayProp: {
     type: Array,
     default: () => []
+  },
+  typedArrayProps: {
+    type: Array as PropType<string[]>,
+    default: () => ([]),
+    required: false
   },
   objectProp: {
     type: Object,

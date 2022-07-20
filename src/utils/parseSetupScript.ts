@@ -19,6 +19,10 @@ export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
       return prop.name
     }
 
+    if (prop.type === 'TSAsExpression') {
+      return getType(prop.typeAnnotation)
+    }
+
     if (prop.type === 'ObjectExpression') {
       return prop.properties.reduce((acc, prop) => {
         acc[prop.key.name] = getValue(prop.value)
@@ -27,7 +31,7 @@ export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
     }
   }
   function getType (tsProperty) {
-    const { type, typeName, elementType } = tsProperty.typeAnnotation?.typeAnnotation || tsProperty
+    const { type, typeName, elementType, typeParameters } = tsProperty.typeAnnotation?.typeAnnotation || tsProperty
     switch (type) {
       case 'TSStringKeyword':
         return 'String'
@@ -38,6 +42,15 @@ export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
       case 'TSObjectKeyword':
         return 'Object'
       case 'TSTypeReference':
+        if (typeParameters?.params) {
+          if (typeName.name === 'PropType') {
+            return getType(typeParameters.params[0])
+          }
+          return {
+            type: typeName.name,
+            elementType: typeParameters.params.map(type => getType(type))
+          }
+        }
         return typeName.name
       case 'TSArrayType':
         return {

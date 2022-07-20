@@ -1,5 +1,6 @@
 export interface ComponentPropType {
   type: string
+  elementType?: string
 }
 
 export interface ComponentProp {

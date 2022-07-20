@@ -1,6 +1,7 @@
 import fsp from 'fs/promises'
 import { fileURLToPath } from 'url'
 import { test, describe, expect } from 'vitest'
+import { ComponentPropType } from '../src/types'
 import { parseComponent } from '../src/utils/parseComponent'
 
 describe('Basic Component', async () => {
@@ -52,6 +53,12 @@ describe('Basic Component', async () => {
 
     expect(arrayProps.length).toBe(1)
     expect(arrayProps[0].name).toBe('arrayProp')
+
+    const typedArrayProps = props.filter(p => (p.type as ComponentPropType)?.type === 'Array')
+
+    expect(typedArrayProps.length).toBe(1)
+    expect(typedArrayProps[0].name).toBe('typedArrayProps')
+    expect((typedArrayProps[0].type as ComponentPropType).elementType).toBe('String')
   })
 
   test('Object', () => {
