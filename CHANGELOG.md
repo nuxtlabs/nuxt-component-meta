@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.8](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.7...v0.1.8) (2022-07-20)
+
+
+### Features
+
+* detect ts as expression and Vue's PropType ([4d2388d](https://github.com/nuxtlabs/nuxt-component-meta/commit/4d2388d680b43c378f4d7f40d37fd5e29455d06d))
+
+
+### Bug Fixes
+
+* check for object properties ([0f20817](https://github.com/nuxtlabs/nuxt-component-meta/commit/0f208173a665b1de758d3486c9791a3c811e350e))
+
 ### [0.1.7](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.6...v0.1.7) (2022-07-19)
 
 
