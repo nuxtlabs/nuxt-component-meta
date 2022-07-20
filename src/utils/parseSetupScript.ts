@@ -50,10 +50,12 @@ export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
   visit(script.scriptSetupAst, node => node.type === 'CallExpression' && node.callee?.name === 'defineProps', (node) => {
     const properties = node.arguments[0]?.properties || []
     properties.reduce((props, p) => {
-      props.push({
-        name: p.key.name,
-        ...getValue(p.value)
-      })
+      if (p.type === 'ObjectProperty') {
+        props.push({
+          name: p.key.name,
+          ...getValue(p.value)
+        })
+      }
       return props
     }, props)
     visit(node, n => n.type === 'TSPropertySignature', (property) => {
