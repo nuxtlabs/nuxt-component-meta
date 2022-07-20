@@ -58,7 +58,8 @@ describe('Basic Component', async () => {
 
     expect(typedArrayProps.length).toBe(1)
     expect(typedArrayProps[0].name).toBe('typedArrayProps')
-    expect((typedArrayProps[0].type as ComponentPropType).elementType).toBe('String')
+    expect(((typedArrayProps[0].type as ComponentPropType)?.as as ComponentPropType)?.type).toBe('Array')
+    expect(((typedArrayProps[0].type as ComponentPropType)?.as as ComponentPropType)?.elementType).toBe('String')
   })
 
   test('Object', () => {

@@ -38,5 +38,68 @@ export function visit (node, test, visitNode) {
     case 'TSTypeLiteral':
       visit(node.members, test, visitNode)
       break
+    case 'ExportDefaultDeclaration':
+      visit(node.declaration, test, visitNode)
+      break
+  }
+}
+
+export function getValue (prop) {
+  if (!prop?.type) {
+    return undefined
+  }
+  if (prop.type.endsWith('Literal')) {
+    return prop.value
+  }
+
+  if (prop.type === 'Identifier') {
+    return prop.name === 'undefined' ? undefined : prop.name
+  }
+
+  if (prop.type === 'TSAsExpression') {
+    return {
+      type: getValue(prop.expression),
+      as: getType(prop.typeAnnotation)
+    }
+  }
+  if (prop.type === 'ArrayExpression') {
+    return prop.elements.map(getValue)
+  }
+
+  if (prop.type === 'ObjectExpression') {
+    return prop.properties.reduce((acc, prop) => {
+      acc[prop.key.name] = getValue(prop.value)
+      return acc
+    }, {})
+  }
+}
+
+export function getType (tsProperty) {
+  const { type, typeName, elementType, typeParameters } = tsProperty.typeAnnotation?.typeAnnotation || tsProperty
+  switch (type) {
+    case 'TSStringKeyword':
+      return 'String'
+    case 'TSNumberKeyword':
+      return 'Number'
+    case 'TSBooleanKeyword':
+      return 'Boolean'
+    case 'TSObjectKeyword':
+      return 'Object'
+    case 'TSTypeReference':
+      if (typeParameters?.params) {
+        if (typeName.name === 'PropType') {
+          return getType(typeParameters.params[0])
+        }
+        return {
+          type: typeName.name,
+          elementType: typeParameters.params.map(type => getType(type))
+        }
+      }
+      return typeName.name
+    case 'TSArrayType':
+      return {
+        type: 'Array',
+        elementType: getType(elementType)
+      }
   }
 }
