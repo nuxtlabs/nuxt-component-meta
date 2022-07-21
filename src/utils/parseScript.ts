@@ -3,12 +3,16 @@ import { compileScript } from '@vue/compiler-sfc'
 import { ComponentProp } from '../types'
 import { getType, getValue, visit } from './ast'
 
-export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
+export function parseScript (id: string, descriptor: SFCDescriptor) {
   const props: ComponentProp[] = []
   const script = compileScript(descriptor, { id })
 
-  visit(script.scriptSetupAst, node => node.type === 'CallExpression' && node.callee?.name === 'defineProps', (node) => {
-    const properties = node.arguments[0]?.properties || []
+  visit(script.scriptAst, node => node.type === 'CallExpression' && node.callee?.name === 'defineComponent', (node) => {
+    const nodeProps = node.arguments?.[0]?.properties?.find(prop => prop.key.name === 'props')
+    if (!nodeProps) {
+      return
+    }
+    const properties = nodeProps.value.properties || []
     properties.reduce((props, p) => {
       if (p.type === 'ObjectProperty') {
         props.push({
