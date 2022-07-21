@@ -6,7 +6,7 @@ import type { ComponentProp, ComponentSlot, HookData } from './types'
 export interface ModuleOptions {}
 
 export interface ModuleHooks {
-  'meta:component:parsed'(data: HookData): void
+  'component-meta:parsed'(data: HookData): void
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -40,7 +40,7 @@ export default defineNuxtModule<ModuleOptions>({
           data.meta.slots = slots
 
           // @ts-ignore
-          await nuxt.callHook('meta:component:parsed', data)
+          await nuxt.callHook('component-meta:parsed', data)
 
           return data.meta
         })
