@@ -18,9 +18,15 @@ export function parseTemplate (id: string, descriptor: SFCDescriptor) {
 
   const findSlots = (nodes: any[]) => {
     if (!nodes.length) { return [] }
-    const slots = nodes.filter(n => n.tag === 'slot').map(s => ({
-      name: JSON.parse(s.codegenNode.arguments[1])
-    }))
+    const slots = nodes.filter(n => n.tag === 'slot').map((s) => {
+      const name = s.codegenNode.arguments[1]
+      if (typeof name === 'string') {
+        return { name: name.replace(/['"`]/g, '') }
+      }
+      return {
+        name: name?.loc?.source?.replace(/['"`]/g, '')
+      }
+    })
     return [
       ...slots,
       ...findSlots(nodes.flatMap(n => n.children || []))
