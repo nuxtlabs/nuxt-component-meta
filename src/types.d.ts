@@ -11,3 +11,18 @@ export interface ComponentProp {
     values?: any,
     description?: string
 }
+
+export interface ComponentSlot {
+  name: string
+}
+
+export interface HookData {
+  meta: {
+    name: string
+    global: boolean
+    props: ComponentProp[]
+    slots: ComponentSlot[]
+  }
+  path: string
+  source: string
+}

@@ -1,8 +1,13 @@
 import { readFile } from 'fs/promises'
 import { defineNuxtModule, resolveModule, createResolver, addServerHandler } from '@nuxt/kit'
 import { parseComponent } from './utils/parseComponent'
+import type { ComponentProp, ComponentSlot, HookData } from './types'
 
 export interface ModuleOptions {}
+
+export interface ModuleHooks {
+  'meta:component:parsed'(data: HookData): void
+}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -16,17 +21,28 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.hook('components:extend', async (components) => {
       componentMeta = await Promise.all(
         components.map(async (component) => {
-          const name = (component as any).pascalName
           const path = resolveModule((component as any).filePath, { paths: nuxt.options.rootDir })
           const source = await readFile(path, { encoding: 'utf-8' })
 
-          const { props, slots } = parseComponent(name, source)
-          return {
-            name,
-            global: Boolean(component.global),
-            props,
-            slots
+          const data: HookData = {
+            meta: {
+              name: (component as any).pascalName,
+              global: Boolean(component.global),
+              props: [] as ComponentProp[],
+              slots: [] as ComponentSlot[]
+            },
+            path,
+            source
           }
+
+          const { props, slots } = parseComponent(data.meta.name, source)
+          data.meta.props = props
+          data.meta.slots = slots
+
+          // @ts-ignore
+          await nuxt.callHook('meta:component:parsed', data)
+
+          return data.meta
         })
       )
     })
