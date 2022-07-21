@@ -1,15 +1,16 @@
 export interface ComponentPropType {
-  type: string
+  type: string | string[]
   elementType?: string
+  as?: string | ComponentPropType
 }
 
 export interface ComponentProp {
-    name: string
-    type?: string | ComponentPropType,
-    default?: any
-    required?: boolean,
-    values?: any,
-    description?: string
+  name: string
+  type?: string | ComponentPropType | string[],
+  default?: any
+  required?: boolean,
+  values?: any,
+  description?: string
 }
 
 export interface ComponentSlot {
