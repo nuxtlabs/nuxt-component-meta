@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.9](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.8...v0.1.9) (2022-07-21)
+
+
+### Features
+
+* add parsed hook ([#29](https://github.com/nuxtlabs/nuxt-component-meta/issues/29)) ([8ce51dd](https://github.com/nuxtlabs/nuxt-component-meta/commit/8ce51dd46bb147491dbc13f2bddcdadfcb582aa8))
+* detect `$slots.*` usage in script ([#31](https://github.com/nuxtlabs/nuxt-component-meta/issues/31)) ([83ae454](https://github.com/nuxtlabs/nuxt-component-meta/commit/83ae454c64b48c158762829a1c45fe886e905da5))
+* parse normal scripts with `defineComponent` ([#28](https://github.com/nuxtlabs/nuxt-component-meta/issues/28)) ([8fca9e4](https://github.com/nuxtlabs/nuxt-component-meta/commit/8fca9e4b78551bbcd56fd5e1f8703d823c6b4f8c))
+
+
+### Bug Fixes
+
+* handle complex slot ([8a41b01](https://github.com/nuxtlabs/nuxt-component-meta/commit/8a41b01f48393d4a414c0bbe8a2e8698b63504e7))
+
 ### [0.1.8](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.7...v0.1.8) (2022-07-20)
 
 
