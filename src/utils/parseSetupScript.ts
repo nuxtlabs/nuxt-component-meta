@@ -2,10 +2,13 @@ import type { SFCDescriptor } from '@vue/compiler-sfc'
 import { compileScript } from '@vue/compiler-sfc'
 import { ComponentProp } from '../types'
 import { getType, getValue, visit } from './ast'
+import { findSlotUsage } from './source'
 
 export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
   const props: ComponentProp[] = []
   const script = compileScript(descriptor, { id })
+
+  const slots = findSlotUsage(script.content)
 
   visit(script.scriptSetupAst, node => node.type === 'CallExpression' && node.callee?.name === 'defineProps', (node) => {
     const properties = node.arguments[0]?.properties || []
@@ -29,6 +32,7 @@ export function parseSetupScript (id: string, descriptor: SFCDescriptor) {
   })
 
   return {
-    props
+    props,
+    slots
   }
 }
