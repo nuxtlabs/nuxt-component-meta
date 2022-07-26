@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises'
-import { defineNuxtModule, resolveModule, createResolver, addServerHandler } from '@nuxt/kit'
+import { defineNuxtModule, resolveModule, createResolver, addServerHandler, addVitePlugin } from '@nuxt/kit'
 import { parseComponent } from './utils/parseComponent'
 import type { ComponentProp, ComponentSlot, HookData } from './types'
 
@@ -64,6 +64,29 @@ export default defineNuxtModule<ModuleOptions>({
       method: 'get',
       route: '/api/component-meta/:component?',
       handler: resolver.resolve('./runtime/server/api/component-meta.get')
+    })
+
+    addVitePlugin({
+      name: 'nuxt-component-meta-loader',
+      resolveId (id) {
+        if (id === 'virtual:nuxt-component-meta') {
+          return '\0virtual:nuxt-component-meta'
+        }
+      },
+      load (id) {
+        if (id === '\0virtual:nuxt-component-meta') {
+          let script = `export const meta = ${JSON.stringify(componentMeta)}`
+          script += 'export default meta'
+
+          for (const component of componentMeta) {
+            script += `\nexport const ${component.name}Meta = ${JSON.stringify(
+              component
+            )}`
+          }
+
+          return script
+        }
+      }
     })
   }
 })
