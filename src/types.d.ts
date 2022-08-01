@@ -1,29 +1,9 @@
-export interface ComponentPropType {
-  type: string | string[]
-  elementType?: string
-  as?: string | ComponentPropType
-}
+import type { ComponentMeta } from 'vue-component-meta'
 
-export interface ComponentProp {
-  name: string
-  type?: string | ComponentPropType | string[],
-  default?: any
-  required?: boolean,
-  values?: any,
-  description?: string
-}
-
-export interface ComponentSlot {
-  name: string
-}
+export type NuxtComponentMeta = ComponentMeta & { name: string, global?: boolean }
 
 export interface HookData {
-  meta: {
-    name: string
-    global: boolean
-    props: ComponentProp[]
-    slots: ComponentSlot[]
-  }
+  meta: NuxtComponentMeta
   path: string
   source: string
 }

@@ -13,5 +13,11 @@ export default defineNuxtConfig({
   },
   modules: [
     nuxtMetaModule
-  ]
+  ],
+  componentMeta: {
+    checkerOptions: {
+      forceUseTs: true,
+      schema: {}
+    }
+  }
 })
