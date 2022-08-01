@@ -44,8 +44,6 @@ export default defineNuxtModule<ModuleOptions>({
         paths: nuxt.options.rootDir
       })
 
-      console.log(component)
-
       const data = {
         meta: {
           name: component.pascalName,
