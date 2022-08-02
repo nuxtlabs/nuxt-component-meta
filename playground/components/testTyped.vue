@@ -7,11 +7,19 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+withDefaults(defineProps<{
   hello: string,
   booleanProp?: boolean,
-  numberProp?: number
-}>()
-const emit = defineEmits(['change', 'delete'])
-
+  numberProp?: number,
+  /**
+   * The foo array property.
+   *
+   * @since v1.0.0
+   */
+  foo?: string[]
+}>(), {
+  numberProp: 42,
+  foo: () => ['bar', 'baz']
+})
+defineEmits(['change', 'delete'])
 </script>

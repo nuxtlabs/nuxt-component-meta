@@ -22,6 +22,12 @@ export default defineNuxtModule<ModuleOptions>({
     name: 'nuxt-component-meta',
     configKey: 'componentMeta'
   },
+  defaults: () => ({
+    checkerOptions: {
+      forceUseTs: true,
+      schema: {}
+    }
+  }),
   setup (options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
@@ -94,8 +100,16 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     let componentMeta: any
-    let script = 'export const all = {}\nexport default all'
-    let dts = "import type { NuxtComponentMeta } from 'nuxt-component-meta'"
+
+    // default to empty permisive object if no componentMeta is defined
+    const script = ['export const components = {}', 'export default components']
+    const dts = [
+      "import type { NuxtComponentMeta } from 'nuxt-component-meta'",
+      'export type { NuxtComponentMeta }',
+      'export type NuxtComponentMetaNames = string',
+      'declare const components: Record<NuxtComponentMetaNames, NuxtComponentMeta>',
+      'export { components as default,  components }'
+    ]
 
     nuxt.hook('components:extend', async (components) => {
       componentMeta = (await Promise.all(components.map(mapper))).reduce(
@@ -103,37 +117,40 @@ export default defineNuxtModule<ModuleOptions>({
         {}
       )
 
-      script = `export const components = ${JSON.stringify(componentMeta)}`
-      script += '\nexport default components'
+      // generate virtual script
+      script.splice(0, script.length)
+      script.push(`export const components = ${JSON.stringify(componentMeta)}`)
+      script.push('export default components')
 
       for (const key in componentMeta) {
-        script += `\nexport const meta${key} = ${JSON.stringify(
+        script.push(`export const meta${key} = ${JSON.stringify(
           componentMeta[key]
-        )}`
+        )}`)
       }
 
-      dts += `\ntype NuxtComponentMetaNames = ${Object.keys(componentMeta)
-        .map(name => `"${name}"`)
-        .join(' | ')}`
-      dts += '\ndeclare const components: Record<NuxtComponentMetaNames, NuxtComponentMeta>'
+      // generate typescript definition file
+      const componentMetaKeys = Object.keys(componentMeta)
+      const componentNameString = componentMetaKeys.map(name => `"${name}"`)
+      const exportNames = componentMetaKeys.map(name => `meta${name}`)
 
-      for (const key in componentMeta) {
-        dts += `\ndeclare const meta${key}: NuxtComponentMeta`
+      dts.splice(2, script.length) // keep the two first lines (import type and export NuxtComponentMeta)
+      dts.push(`export type NuxtComponentMetaNames = ${componentNameString.join(' | ')}`)
+      dts.push('declare const components: Record<NuxtComponentMetaNames, NuxtComponentMeta>')
+
+      for (const exportName of exportNames) {
+        dts.push(`declare const ${exportName}: NuxtComponentMeta`)
       }
-      dts += `\nexport { components as default, components, ${Object.keys(
-        componentMeta
-      )
-        .map(name => `meta${name}`)
-        .join(', ')} }`
+
+      dts.push(`export { components as default, components, ${exportNames.join(', ')} }`)
     })
 
     const template = addTemplate({
       filename: 'nuxt-component-meta.mjs',
-      getContents: () => script
+      getContents: () => script.join('\n')
     })
     addTemplate({
       filename: 'nuxt-component-meta.d.ts',
-      getContents: () => dts,
+      getContents: () => dts.join('\n'),
       write: true
     })
     nuxt.options.alias['#nuxt-component-meta'] = template.dst!
@@ -142,10 +159,7 @@ export default defineNuxtModule<ModuleOptions>({
       nitroConfig.handlers = nitroConfig.handlers || []
       nitroConfig.virtual = nitroConfig.virtual || {}
 
-      nitroConfig.virtual['#meta/virtual/meta'] = () =>
-        `export const components = ${JSON.stringify(
-          componentMeta
-        )}\nexport default components`
+      nitroConfig.virtual['#meta/virtual/meta'] = () => script.join('\n')
     })
 
     addServerHandler({

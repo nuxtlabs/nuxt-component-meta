@@ -7,7 +7,16 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
+  foo: {
+    type: String,
+    required: true
+  },
+  /**
+   * The hello property.
+   *
+   * @since v1.0.0
+   */
   hello: {
     type: String,
     default: 'Hello'
@@ -22,5 +31,4 @@ const props = defineProps({
   }
 })
 const emit = defineEmits(['change', 'delete'])
-
 </script>
