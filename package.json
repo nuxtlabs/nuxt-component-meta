@@ -27,6 +27,7 @@
   "dependencies": {
     "@nuxt/kit": "^3.0.0-rc.3",
     "@vue/compiler-sfc": "^3.2.33",
+    "pathe": "^0.3.3",
     "scule": "^0.2.1"
   },
   "devDependencies": {
