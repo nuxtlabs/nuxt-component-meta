@@ -8,7 +8,7 @@ describe('Basic Component', async () => {
   const path = fileURLToPath(new URL('./fixtures/basic/components/BasicComponent.vue', import.meta.url))
   const source = await fsp.readFile(path, { encoding: 'utf-8' })
   // Parse component source
-  const { props, slots } = parseComponent('BasicComponent', source)
+  const { props, slots } = parseComponent('BasicComponent', source, 'BasicComponent.vue')
 
   test('Slots', () => {
     expect(slots).toEqual([
