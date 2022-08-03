@@ -1,4 +1,5 @@
 import { readFile } from 'fs/promises'
+import { basename } from 'pathe'
 import { defineNuxtModule, resolveModule, createResolver, addServerHandler } from '@nuxt/kit'
 import { parseComponent } from './utils/parseComponent'
 import type { ComponentProp, ComponentSlot, HookData } from './types'
@@ -35,7 +36,7 @@ export default defineNuxtModule<ModuleOptions>({
             source
           }
 
-          const { props, slots } = parseComponent(data.meta.name, source)
+          const { props, slots } = parseComponent(data.meta.name, source, { filename: basename(path) })
           data.meta.props = props
           data.meta.slots = slots
 
