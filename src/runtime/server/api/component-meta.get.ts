@@ -9,7 +9,7 @@ export default defineEventHandler((event) => {
   const componentName = event.context.params['component?']
 
   if (componentName) {
-    const meta = components.find(c => c.name === pascalCase(componentName))
+    const meta = components[pascalCase(componentName)]
     if (!meta) {
       throw createError({
         statusMessage: 'Components not found!',
