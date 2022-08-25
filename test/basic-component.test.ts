@@ -1,14 +1,13 @@
 import fsp from 'fs/promises'
 import { fileURLToPath } from 'url'
 import { test, describe, expect } from 'vitest'
-import { ComponentPropType } from '../src/types'
 import { parseComponent } from '../src/utils/parseComponent'
 
 describe('Basic Component', async () => {
   const path = fileURLToPath(new URL('./fixtures/basic/components/BasicComponent.vue', import.meta.url))
   const source = await fsp.readFile(path, { encoding: 'utf-8' })
   // Parse component source
-  const { props, slots } = parseComponent('BasicComponent', source)
+  const { props, slots } = parseComponent('BasicComponent', source, { filename: 'BasicComponent.vue' })
 
   test('Slots', () => {
     expect(slots).toEqual([
@@ -54,12 +53,12 @@ describe('Basic Component', async () => {
     expect(arrayProps.length).toBe(1)
     expect(arrayProps[0].name).toBe('arrayProp')
 
-    const typedArrayProps = props.filter(p => (p.type as ComponentPropType)?.type === 'Array')
+    const typedArrayProps = props.filter(p => p.type?.type === 'Array')
 
     expect(typedArrayProps.length).toBe(1)
     expect(typedArrayProps[0].name).toBe('typedArrayProps')
-    expect(((typedArrayProps[0].type as ComponentPropType)?.as as ComponentPropType)?.type).toBe('Array')
-    expect(((typedArrayProps[0].type as ComponentPropType)?.as as ComponentPropType)?.elementType).toBe('String')
+    expect(typedArrayProps[0].type?.as?.type).toBe('Array')
+    expect(typedArrayProps[0].type?.as?.elementType).toBe('String')
   })
 
   test('Object', () => {

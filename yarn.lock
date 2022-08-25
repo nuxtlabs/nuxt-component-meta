@@ -5055,6 +5055,11 @@ pathe@^0.3.0:
   resolved "https://registry.yarnpkg.com/pathe/-/pathe-0.3.0.tgz#fd95bc16208263fa6dc1c78c07b3907a528de6eb"
   integrity sha512-3vUjp552BJzCw9vqKsO5sttHkbYqqsZtH0x1PNtItgqx8BXEXzoY1SYRKcL6BTyVh4lGJGLj0tM42elUDMvcYA==
 
+pathe@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/pathe/-/pathe-0.3.3.tgz#8d6d70a25d4db6024ed4d59e59c1bf80fcf18753"
+  integrity sha512-x3nrPvG0HDSDzUiJ0WqtzhN4MD+h5B+dFJ3/qyxVuARlr4Y3aJv8gri2cZzp9Z8sGs2a+aG9gNbKngh3gme57A==
+
 pathval@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.1.tgz#8534e77a77ce7ac5a2512ea21e0fdb8fcf6c3d8d"
