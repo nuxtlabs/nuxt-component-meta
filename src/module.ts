@@ -7,7 +7,7 @@ import {
   resolveModule
 } from '@nuxt/kit'
 
-import { createComponentMetaChecker } from 'vue-component-meta'
+import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import type { HookData } from './types'
 
 export interface ModuleOptions {
@@ -31,75 +31,7 @@ export default defineNuxtModule<ModuleOptions>({
   setup (options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    const tsconfigPath = resolver.resolve(nuxt.options.rootDir, 'tsconfig.json')
-    const checker = createComponentMetaChecker(
-      tsconfigPath,
-      options.checkerOptions
-    )
-
-    function reducer (acc: any, component: any) {
-      if (component.name) {
-        acc[component.name] = component
-      }
-
-      return acc
-    }
-
-    async function mapper (component: any): Promise<HookData['meta']> {
-      const path = resolveModule(component.filePath, {
-        paths: nuxt.options.rootDir
-      })
-
-      const data = {
-        meta: {
-          name: component.pascalName,
-          global: Boolean(component.global),
-          props: [],
-          slots: [],
-          events: [],
-          exposed: []
-        },
-        path,
-        source: ''
-      } as HookData
-
-      try {
-        const { props, slots, events, exposed } = checker.getComponentMeta(path)
-
-        data.meta.slots = slots
-        data.meta.events = events
-        data.meta.exposed = exposed
-        data.meta.props = props
-          .filter(prop => !prop.global)
-          .sort((a, b) => {
-            // sort required properties first
-            if (!a.required && b.required) {
-              return 1
-            }
-            if (a.required && !b.required) {
-              return -1
-            }
-            // then ensure boolean properties are sorted last
-            if (a.type === 'boolean' && b.type !== 'boolean') {
-              return 1
-            }
-            if (a.type !== 'boolean' && b.type === 'boolean') {
-              return -1
-            }
-
-            return 0
-          })
-
-        // @ts-ignore
-        await nuxt.callHook('component-meta:parsed', data)
-      } catch (error: any) {
-        console.error(`Unable to parse component "${path}": ${error}`)
-      }
-
-      return data.meta
-    }
-
-    let componentMeta: any
+    let componentMeta: any = {}
 
     // default to empty permisive object if no componentMeta is defined
     const script = ['export const components = {}', 'export default components']
@@ -112,6 +44,83 @@ export default defineNuxtModule<ModuleOptions>({
     ]
 
     nuxt.hook('components:extend', async (components) => {
+      const checker = createComponentMetaCheckerByJsonConfig(
+        nuxt.options.rootDir,
+        {
+          extends: '../tsconfig.json',
+          include: [
+            '**/*'
+          ]
+        },
+        options.checkerOptions
+      )
+
+      function reducer (acc: any, component: any) {
+        if (component.name) {
+          acc[component.name] = component
+        }
+
+        return acc
+      }
+
+      async function mapper (component: any): Promise<HookData['meta']> {
+        const path = resolveModule(component.filePath, {
+          paths: nuxt.options.rootDir
+        })
+
+        const data = {
+          meta: {
+            name: component.pascalName,
+            global: Boolean(component.global),
+            props: [],
+            slots: [],
+            events: [],
+            exposed: []
+          },
+          path,
+          source: ''
+        } as HookData
+
+        if (!checker) {
+          return data.meta
+        }
+
+        try {
+          const { props, slots, events, exposed } = checker?.getComponentMeta(path)
+
+          data.meta.slots = slots
+          data.meta.events = events
+          data.meta.exposed = exposed
+          data.meta.props = props
+            .filter(prop => !prop.global)
+            .sort((a, b) => {
+              // sort required properties first
+              if (!a.required && b.required) {
+                return 1
+              }
+              if (a.required && !b.required) {
+                return -1
+              }
+              // then ensure boolean properties are sorted last
+              if (a.type === 'boolean' && b.type !== 'boolean') {
+                return 1
+              }
+              if (a.type !== 'boolean' && b.type === 'boolean') {
+                return -1
+              }
+
+              return 0
+            })
+
+          // @ts-ignore
+          await nuxt.callHook('component-meta:parsed', data)
+        } catch (error: any) {
+          console.error(`Unable to parse component "${path}": ${error}`)
+        }
+
+        return data.meta
+      }
+
       componentMeta = (await Promise.all(components.map(mapper))).reduce(
         reducer,
         {}

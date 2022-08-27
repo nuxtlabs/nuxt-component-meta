@@ -902,25 +902,27 @@
   resolved "https://registry.yarnpkg.com/@vitejs/plugin-vue/-/plugin-vue-3.0.3.tgz#7e3e401ccb30b4380d2279d9849281413f1791ef"
   integrity sha512-U4zNBlz9mg+TA+i+5QPc3N5lQvdUXENZLO2h0Wdzp56gI1MWhqJOv+6R+d4kOzoaSSq6TnGPBdZAXKOe4lXy6g==
 
-"@volar/code-gen@0.40.1":
-  version "0.40.1"
-  resolved "https://registry.yarnpkg.com/@volar/code-gen/-/code-gen-0.40.1.tgz#30637162626bd2ea6e3c3c3cedab291494870c25"
-  integrity sha512-mN1jn08wRKLoUj+KThltyWfsiEGt6Um1yT6S7bkruwV76yiLlzIR4WZgWng254byGMozJ00qgkZmBhraD5b48A==
+"@volar/code-gen@0.40.2":
+  version "0.40.2"
+  resolved "https://registry.yarnpkg.com/@volar/code-gen/-/code-gen-0.40.2.tgz#867f466bf3388676b6e44ff5ef027dd14e0ade92"
+  integrity sha512-1Z08SJkJOdQiXYdDpwOynLz/grL50uENz65qmQLpgaN12WiekkdWqeFOZSlB9FbWgB686wBnlAV8sxUqWtoSmA==
   dependencies:
-    "@volar/source-map" "0.40.1"
+    "@volar/source-map" "0.40.2"
 
-"@volar/source-map@0.40.1":
-  version "0.40.1"
-  resolved "https://registry.yarnpkg.com/@volar/source-map/-/source-map-0.40.1.tgz#9fcefb21ce0e0ca272f76129b6a98b6f08f4debb"
-  integrity sha512-ORYg5W+R4iT2k/k2U4ASkKvDxabIzKtP+lXZ1CcqFIbTF81GOooAv5tJZImf8ifhUV9p8bgGaitFj/VnNzkdYg==
-
-"@volar/vue-language-core@0.40.1":
-  version "0.40.1"
-  resolved "https://registry.yarnpkg.com/@volar/vue-language-core/-/vue-language-core-0.40.1.tgz#a11429b59351202af1a89167039a07b4bffbcefc"
-  integrity sha512-RBU2nQkj+asKZ/ht3sU3hTau+dGuTjJrQS3nNSw4+vnwUJnN/WogO/MmgKdrvVf3pUdLiucIog1E/Us1C8Y5wg==
+"@volar/source-map@0.40.2":
+  version "0.40.2"
+  resolved "https://registry.yarnpkg.com/@volar/source-map/-/source-map-0.40.2.tgz#47923524fee4f75eb357fac026469a5a1c87367d"
+  integrity sha512-gXH4hXq1rbi4h6KekZvFekSescKguMRWDMkvRGXwu/3IL24BEMxWIqmTazAHsHO/yR1gN4nz/iMFoEX5f0n20Q==
   dependencies:
-    "@volar/code-gen" "0.40.1"
-    "@volar/source-map" "0.40.1"
+    "@vue/reactivity" "3.2.37"
+
+"@volar/vue-language-core@0.40.2":
+  version "0.40.2"
+  resolved "https://registry.yarnpkg.com/@volar/vue-language-core/-/vue-language-core-0.40.2.tgz#ffe7d88179ec4f4ec8fdde64a97b345573fc5e15"
+  integrity sha512-faJZFOuJEVxe97pNaTofVnICAZ01AVsnwt5dhkxK2hIgeKfY1R2hs8NVetqPRpWgh1IVwN/FZEfbaHvNkXbgCQ==
+  dependencies:
+    "@volar/code-gen" "0.40.2"
+    "@volar/source-map" "0.40.2"
     "@vue/compiler-core" "^3.2.37"
     "@vue/compiler-dom" "^3.2.37"
     "@vue/compiler-sfc" "^3.2.37"
@@ -6466,12 +6468,12 @@ vue-bundle-renderer@^0.4.1:
   dependencies:
     ufo "^0.8.3"
 
-vue-component-meta@0.40.1:
-  version "0.40.1"
-  resolved "https://registry.yarnpkg.com/vue-component-meta/-/vue-component-meta-0.40.1.tgz#19674ba096f1d6ce70cfbbdedce9d0edea058a5e"
-  integrity sha512-aLt9jrcAY5d84bevLLEOGr2wU7sQ1rM7J3/+1RBs222SRNdeSPofZVgZq0R1Cq2LQxjlmDcpgjRr0Kday4Mudw==
+vue-component-meta@^0.40.2:
+  version "0.40.2"
+  resolved "https://registry.yarnpkg.com/vue-component-meta/-/vue-component-meta-0.40.2.tgz#97cc4ee65521cf13f3e07dd75de4622f83a9457b"
+  integrity sha512-WY+fW/GOP1XEcwDM4LSjhuQuZ8YHvpD9XhOgFO4CdlPBdVbh2fBqmgGFjSpEBJEQ5/+yKxqIW0P9cWBAZ6LeeA==
   dependencies:
-    "@volar/vue-language-core" "0.40.1"
+    "@volar/vue-language-core" "0.40.2"
 
 vue-eslint-parser@^8.0.1:
   version "8.3.0"

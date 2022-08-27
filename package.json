@@ -27,7 +27,7 @@
   "dependencies": {
     "@nuxt/kit": "^3.0.0-rc.3",
     "scule": "^0.3.2",
-    "vue-component-meta": "0.40.1"
+    "vue-component-meta": "^0.40.2"
   },
   "devDependencies": {
     "@iconify/vue": "^3.2.1",
