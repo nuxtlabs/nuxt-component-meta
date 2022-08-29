@@ -45,7 +45,11 @@ export default defineNuxtModule<ModuleOptions>({
     ]
 
     nuxt.hook('components:dirs', (dirs) => {
-      componentDirs = dirs
+      componentDirs = [
+        ...dirs,
+        { path: resolveModule('nuxt').replace('/index.mjs', '/app') },
+        { path: resolveModule('@nuxt/ui-templates').replace('/index.mjs', '/templates') }
+      ]
     })
     nuxt.hook('components:extend', async (components) => {
       const includeDirs = componentDirs.map(dir => `${dir.path}/**/*`)

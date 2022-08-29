@@ -3,8 +3,7 @@
   "name": "nuxt-component-meta-playground",
   "devDependencies": {
     "@nuxt/content": "npm:@nuxt/content-edge@latest",
-    "nuxt": "^3.0.0-rc.8",
-    "nuxt-component-meta": "file:.."
+    "nuxt": "^3.0.0-rc.8"
   },
   "scripts": {
     "dev": "nuxi dev",
