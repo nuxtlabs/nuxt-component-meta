@@ -10,17 +10,17 @@ describe('fixtures:basic', async () => {
 
   test('List components', async () => {
     const components = await $fetch('/api/component-meta')
-    expect(components.length).greaterThan(0)
+    expect(Object.keys(components).length).greaterThan(0)
 
-    components.forEach((component) => {
-      expect(component).ownProperty('name')
-      expect(component).ownProperty('props')
-      expect(Array.isArray(component.props)).toBeTruthy()
-      expect(component).ownProperty('slots')
-      expect(Array.isArray(component.slots)).toBeTruthy()
+    Object.keys(components).forEach((name) => {
+      expect(components[name]).ownProperty('name')
+      expect(components[name]).ownProperty('props')
+      expect(Array.isArray(components[name].props)).toBeTruthy()
+      expect(components[name]).ownProperty('slots')
+      expect(Array.isArray(components[name].slots)).toBeTruthy()
     })
 
-    const testComponent = components.find(c => c.name === 'TestComponent')
+    const testComponent = components.TestComponent
     expect(testComponent.props).toMatchObject([{
       name: 'hello'
     }])

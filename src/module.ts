@@ -1,11 +1,18 @@
-import { readFile } from 'fs/promises'
-import { basename } from 'pathe'
-import { defineNuxtModule, resolveModule, createResolver, addServerHandler } from '@nuxt/kit'
-import { parseComponent } from './utils/parseComponent'
-import type { ComponentProp, ComponentSlot, HookData } from './types'
+import type { MetaCheckerOptions } from 'vue-component-meta'
+import {
+  addServerHandler,
+  addTemplate,
+  createResolver,
+  defineNuxtModule,
+  resolveModule
+} from '@nuxt/kit'
 
-export interface ModuleOptions {}
+import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
+import type { HookData } from './types'
 
+export interface ModuleOptions {
+  checkerOptions?: MetaCheckerOptions
+}
 export interface ModuleHooks {
   'component-meta:parsed'(data: HookData): void
 }
@@ -15,44 +22,153 @@ export default defineNuxtModule<ModuleOptions>({
     name: 'nuxt-component-meta',
     configKey: 'componentMeta'
   },
-  setup (_options, nuxt) {
+  defaults: () => ({
+    checkerOptions: {
+      forceUseTs: true,
+      schema: {}
+    }
+  }),
+  setup (options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    let componentMeta
+    let componentMeta: any = {}
+
+    // default to empty permisive object if no componentMeta is defined
+    const script = ['export const components = {}', 'export default components']
+    const dts = [
+      "import type { NuxtComponentMeta } from 'nuxt-component-meta'",
+      'export type { NuxtComponentMeta }',
+      'export type NuxtComponentMetaNames = string',
+      'declare const components: Record<NuxtComponentMetaNames, NuxtComponentMeta>',
+      'export { components as default,  components }'
+    ]
+
     nuxt.hook('components:extend', async (components) => {
-      componentMeta = await Promise.all(
-        components.map(async (component) => {
-          const path = resolveModule((component as any).filePath, { paths: nuxt.options.rootDir })
-          const source = await readFile(path, { encoding: 'utf-8' })
+      const checker = createComponentMetaCheckerByJsonConfig(
+        nuxt.options.rootDir,
+        {
+          extends: '../tsconfig.json',
+          include: [
+            '**/*'
+          ]
+        },
+        options.checkerOptions
+      )
 
-          const data: HookData = {
-            meta: {
-              name: (component as any).pascalName,
-              global: Boolean(component.global),
-              props: [] as ComponentProp[],
-              slots: [] as ComponentSlot[]
-            },
-            path,
-            source
-          }
+      function reducer (acc: any, component: any) {
+        if (component.name) {
+          acc[component.name] = component
+        }
 
-          const { props, slots } = parseComponent(data.meta.name, source, { filename: basename(path) })
-          data.meta.props = props
+        return acc
+      }
+
+      async function mapper (component: any): Promise<HookData['meta']> {
+        const path = resolveModule(component.filePath, {
+          paths: nuxt.options.rootDir
+        })
+
+        const data = {
+          meta: {
+            name: component.pascalName,
+            global: Boolean(component.global),
+            props: [],
+            slots: [],
+            events: [],
+            exposed: []
+          },
+          path,
+          source: ''
+        } as HookData
+
+        if (!checker) {
+          return data.meta
+        }
+
+        try {
+          const { props, slots, events, exposed } = checker?.getComponentMeta(path)
+
           data.meta.slots = slots
+          data.meta.events = events
+          data.meta.exposed = exposed
+          data.meta.props = props
+            .filter(prop => !prop.global)
+            .sort((a, b) => {
+              // sort required properties first
+              if (!a.required && b.required) {
+                return 1
+              }
+              if (a.required && !b.required) {
+                return -1
+              }
+              // then ensure boolean properties are sorted last
+              if (a.type === 'boolean' && b.type !== 'boolean') {
+                return 1
+              }
+              if (a.type !== 'boolean' && b.type === 'boolean') {
+                return -1
+              }
+
+              return 0
+            })
 
           // @ts-ignore
           await nuxt.callHook('component-meta:parsed', data)
+        } catch (error: any) {
+          console.error(`Unable to parse component "${path}": ${error}`)
+        }
 
-          return data.meta
-        })
+        return data.meta
+      }
+
+      componentMeta = (await Promise.all(components.map(mapper))).reduce(
+        reducer,
+        {}
       )
+
+      // generate virtual script
+      script.splice(0, script.length)
+      script.push(`export const components = ${JSON.stringify(componentMeta)}`)
+      script.push('export default components')
+
+      for (const key in componentMeta) {
+        script.push(`export const meta${key} = ${JSON.stringify(
+          componentMeta[key]
+        )}`)
+      }
+
+      // generate typescript definition file
+      const componentMetaKeys = Object.keys(componentMeta)
+      const componentNameString = componentMetaKeys.map(name => `"${name}"`)
+      const exportNames = componentMetaKeys.map(name => `meta${name}`)
+
+      dts.splice(2, script.length) // keep the two first lines (import type and export NuxtComponentMeta)
+      dts.push(`export type NuxtComponentMetaNames = ${componentNameString.join(' | ')}`)
+      dts.push('declare const components: Record<NuxtComponentMetaNames, NuxtComponentMeta>')
+
+      for (const exportName of exportNames) {
+        dts.push(`declare const ${exportName}: NuxtComponentMeta`)
+      }
+
+      dts.push(`export { components as default, components, ${exportNames.join(', ')} }`)
     })
+
+    const template = addTemplate({
+      filename: 'nuxt-component-meta.mjs',
+      getContents: () => script.join('\n')
+    })
+    addTemplate({
+      filename: 'nuxt-component-meta.d.ts',
+      getContents: () => dts.join('\n'),
+      write: true
+    })
+    nuxt.options.alias['#nuxt-component-meta'] = template.dst!
 
     nuxt.hook('nitro:config', (nitroConfig) => {
       nitroConfig.handlers = nitroConfig.handlers || []
       nitroConfig.virtual = nitroConfig.virtual || {}
 
-      nitroConfig.virtual['#meta/virtual/meta'] = () => `export const components = ${JSON.stringify(componentMeta)}`
+      nitroConfig.virtual['#meta/virtual/meta'] = () => script.join('\n')
     })
 
     addServerHandler({
