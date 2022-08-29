@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.2.0...v0.2.1) (2022-08-29)
+
+
+### Bug Fixes
+
+* node modules components ([#38](https://github.com/nuxtlabs/nuxt-component-meta/issues/38)) ([d984090](https://github.com/nuxtlabs/nuxt-component-meta/commit/d9840902781be0697657c4b752697b5b45605a08))
+
 ## [0.2.0](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.9...v0.2.0) (2022-08-29)
 
 
