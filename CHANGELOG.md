@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.9...v0.2.0) (2022-08-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* use vue-component-meta (#34)
+
+### Features
+
+* use vue-component-meta ([#34](https://github.com/nuxtlabs/nuxt-component-meta/issues/34)) ([f17413d](https://github.com/nuxtlabs/nuxt-component-meta/commit/f17413db27dd008524e57c201bb0cefba129a96e))
+
+
+### Bug Fixes
+
+* skip parsing non-sfcs ([#36](https://github.com/nuxtlabs/nuxt-component-meta/issues/36)) ([6f4f4cd](https://github.com/nuxtlabs/nuxt-component-meta/commit/6f4f4cd9c9a11d040fd47247bc6f36a2b0987c27))
+
 ### [0.1.9](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.1.8...v0.1.9) (2022-07-21)
 
 
