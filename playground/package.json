@@ -3,12 +3,12 @@
   "name": "nuxt-component-meta-playground",
   "devDependencies": {
     "@nuxt/content": "npm:@nuxt/content-edge@latest",
-    "nuxt": "^3.0.0-rc.8"
+    "nuxt": "^3.0.0-rc.8",
+    "nuxt-component-meta": "file:.."
   },
   "scripts": {
-    "prepack": "nuxt-module-build",
-    "dev": "nuxi dev ",
-    "build": "nuxi build ",
-    "generate": "nuxi generate "
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "generate": "nuxi generate"
   }
 }

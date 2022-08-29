@@ -1,5 +1,5 @@
 import { defineNuxtConfig } from 'nuxt'
-import nuxtMetaModule from '../src/module'
+import nuxtMetaModule from 'nuxt-component-meta'
 
 export default defineNuxtConfig({
   components: {
