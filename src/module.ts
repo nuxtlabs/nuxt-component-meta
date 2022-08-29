@@ -32,6 +32,7 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
 
     let componentMeta: any = {}
+    let componentDirs: any[] = []
 
     // default to empty permisive object if no componentMeta is defined
     const script = ['export const components = {}', 'export default components']
@@ -43,14 +44,20 @@ export default defineNuxtModule<ModuleOptions>({
       'export { components as default,  components }'
     ]
 
+    nuxt.hook('components:dirs', (dirs) => {
+      componentDirs = dirs
+    })
     nuxt.hook('components:extend', async (components) => {
+      const includeDirs = componentDirs.map(dir => `${dir.path}/**/*`)
       const checker = createComponentMetaCheckerByJsonConfig(
         nuxt.options.rootDir,
         {
-          extends: '../tsconfig.json',
+          skipLibCheck: false,
           include: [
-            '**/*'
-          ]
+            '**/*',
+            ...includeDirs
+          ],
+          exclude: []
         },
         options.checkerOptions
       )
