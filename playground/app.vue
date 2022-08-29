@@ -5,9 +5,6 @@
     <hr />
     <h2>Components from <code>#nuxt-component-meta</code> virtual module</h2>
     <pre>{{ components }}</pre>
-    <NuxtWelcome />
-    <NuxtLayout />
-    <NuxtLoadingIndicator />
   </div>
 </template>
 
