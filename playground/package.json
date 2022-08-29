@@ -1,4 +1,13 @@
 {
   "private": true,
-  "name": "nuxt-component-meta-playground"
+  "name": "nuxt-component-meta-playground",
+  "devDependencies": {
+    "@nuxt/content": "npm:@nuxt/content-edge@latest",
+    "nuxt": "^3.0.0-rc.8"
+  },
+  "scripts": {
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "generate": "nuxi generate"
+  }
 }
