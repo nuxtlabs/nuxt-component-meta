@@ -56,6 +56,7 @@ export default defineNuxtModule<ModuleOptions>({
       const checker = createComponentMetaCheckerByJsonConfig(
         nuxt.options.rootDir,
         {
+          extends: `${nuxt.options.rootDir}/tsconfig.json`,
           skipLibCheck: false,
           include: [
             '**/*',
