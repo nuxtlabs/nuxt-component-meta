@@ -1,6 +1,7 @@
 import { defineEventHandler, createError, appendHeader } from 'h3'
 import { pascalCase } from 'scule'
-import { components } from '#meta/virtual/meta'
+// @ts-expect-error - Not resolve from tsconfig
+// import { components } from '#meta/virtual/meta'
 
 export default defineEventHandler((event) => {
   // TODO: Replace via downstream config
@@ -8,6 +9,7 @@ export default defineEventHandler((event) => {
 
   const componentName = event.context.params['component?']
 
+  /*
   if (componentName) {
     const meta = components[pascalCase(componentName)]
     if (!meta) {
@@ -22,6 +24,7 @@ export default defineEventHandler((event) => {
 
     return meta
   }
+  */
 
-  return components
+  return [] // components
 })

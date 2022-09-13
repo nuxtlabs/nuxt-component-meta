@@ -1,7 +1,9 @@
 <template>
   <div>
-    <slot />
     <hr>
+    TestComponent
+    <hr>
+    <slot />
     <slot name="nuxt" />
   </div>
 </template>
