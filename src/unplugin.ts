@@ -1,24 +1,25 @@
 
 import { writeFileSync } from 'fs'
-import { checkServerIdentity } from 'tls'
+import { log } from 'console'
 import { defu } from 'defu'
 import { createUnplugin } from 'unplugin'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import { resolveModule } from '@nuxt/kit'
-import type { ViteDevServer } from 'vite'
 import { join } from 'pathe'
+import virtual, { updateVirtualModule } from 'vite-plugin-virtual'
 
-export const defaultOptions = {
-}
+export const META_CACHE_KEY = 'virtual:component-meta'
 
 interface ComponentReferences {
 }
 
-export default createUnplugin<any>(
-  (options) => {
-    options = defu(options, defaultOptions)
+export const storagePlugin = virtual({
+  [META_CACHE_KEY]: 'export default {}'
+})
 
-    let server: ViteDevServer
+export const metaPlugin = createUnplugin<any>(
+  (options) => {
+    const outputPath = join(options.outputDir, 'component-meta-cache.mjs')
 
     /**
      * Initialize component data object from components
@@ -28,11 +29,11 @@ export default createUnplugin<any>(
         (acc, component) => {
           if (!component.filePath || !component.pascalName) { return acc }
 
-          const fullPath = resolveModule(component.filePath, { paths: [options.rootDir] })
+          const filePath = resolveModule(component.filePath, { paths: [options.rootDir] })
 
           acc[component.pascalName] = {
             ...component,
-            fullPath,
+            filePath: filePath.replace(options.rootDir, ''),
             meta: {
               props: [],
               slots: [],
@@ -46,6 +47,10 @@ export default createUnplugin<any>(
         {}
       )
     }
+
+    const getComponents = () => components
+
+    const getStringifiedComponents = () => JSON.stringify(getComponents(), null, 2)
 
     let checker
     const refreshChecker = () => {
@@ -72,12 +77,15 @@ export default createUnplugin<any>(
      * Output is needed for Nitro
      */
     const updateOutput = () => {
-      console.log('write!', { components: components.TestComponent.meta.props })
+      const content = `export default ${getStringifiedComponents()}`
+
       writeFileSync(
-        join(options.outputDir, 'components-meta.mjs'),
-        `export const components = ${JSON.stringify(components, null, 2)}`,
+        outputPath,
+        content,
         'utf-8'
       )
+
+      updateVirtualModule(storagePlugin, META_CACHE_KEY, content)
     }
 
     const fetchComponent = (component: string | any) => {
@@ -86,9 +94,7 @@ export default createUnplugin<any>(
           if (components[component]) {
             component = components[component]
           } else {
-            component = Object.entries(components).find(([, comp]) => {
-              return comp.fullPath === component
-            })
+            component = Object.entries(components).find(([, comp]: any) => (comp.filePath === component))
 
             // No component found via string
             if (!component) { return }
@@ -98,9 +104,9 @@ export default createUnplugin<any>(
         }
 
         // Component is missing required values
-        if (!component?.fullPath || !component?.pascalName) { return }
+        if (!component?.filePath || !component?.pascalName) { return }
 
-        const { props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
+        const { props, slots, events, exposed } = checker.getComponentMeta(component.filePath)
 
         component.meta.slots = slots
         component.meta.events = events
@@ -128,15 +134,11 @@ export default createUnplugin<any>(
 
         components[component.pascalName] = component
       } catch (e) {
-        console.log(`Could not parse ${component?.pascalName || component?.fullPath || 'a component'}!`)
+        !options?.silent && console.log(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
       }
     }
 
     const fetchComponents = () => Object.values(components).forEach(fetchComponent)
-
-    fetchComponents()
-
-    updateOutput()
 
     return {
       name: 'component-meta',
@@ -144,42 +146,27 @@ export default createUnplugin<any>(
       enforce: 'post',
 
       vite: {
-        configureServer (_server) {
-          server = _server
+        configureServer () {
+          fetchComponents()
+          updateOutput()
         },
-        handleHotUpdate ({ file }) {
-          if (Object.entries(components).some(([key, comp]) => comp.fullPath === file)) {
+        handleHotUpdate ({ file, server }) {
+          if (Object.entries(components).some(([, comp]: any) => comp.filePath === file)) {
             refreshChecker()
             fetchComponent(file)
             updateOutput()
-            const cache = server.moduleGraph.getModuleById('/virtual:component-meta-storage')
-            server.moduleGraph.invalidateModule(cache)
             server.ws.send({
-              type: 'update',
-              updates: [
-                {
-                  path: '/virtual:component-meta-storage',
-                  acceptedPath: '/virtual:component-meta-storage',
-                  timestamp: +Date.now(),
-                  type: 'js-update'
-
-                }
-              ]
+              type: 'custom',
+              event: 'component-meta:update',
+              data: getComponents()
             })
           }
         }
       },
 
       resolveId (id) {
-        if (id === '#component-meta') {
-          return '/virtual:component-meta-storage'
-        }
-      },
-
-      load (id) {
-        if (id === '/virtual:component-meta-storage') {
-          console.log(JSON.stringify(components, null, 2))
-          return `export const components = ${JSON.stringify(components, null, 2)}`
+        if (id.includes('#nuxt-component-meta')) {
+          return id.replace('#nuxt-component-meta', META_CACHE_KEY)
         }
       }
     }

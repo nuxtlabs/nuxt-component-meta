@@ -1,19 +1,21 @@
+import { readFileSync } from 'fs'
 import type { MetaCheckerOptions } from 'vue-component-meta'
 import {
   addServerHandler,
   createResolver,
   defineNuxtModule,
-  resolveModule
+  resolveModule,
+  addImportsDir
 } from '@nuxt/kit'
 import { join } from 'pathe'
-
 import type { ComponentsDir, ComponentsOptions } from '@nuxt/schema'
 import type { HookData } from './types'
-import unplugin from './unplugin'
+import { metaPlugin, storagePlugin } from './unplugin'
 
 export interface ModuleOptions {
   outputDir?: string
   rootDir?: string
+  silent?: boolean
   componentDirs: (string | ComponentsDir)[]
   components?: ComponentsOptions[]
   checkerOptions?: MetaCheckerOptions
@@ -32,6 +34,7 @@ export default defineNuxtModule<ModuleOptions>({
     rootDir: nuxt.options.rootDir,
     componentDirs: [],
     components: [],
+    silent: true,
     checkerOptions: {
       forceUseTs: true,
       schema: {}
@@ -40,9 +43,9 @@ export default defineNuxtModule<ModuleOptions>({
   setup (options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
+    // Resolve loaded components
     let componentDirs: (string | ComponentsDir)[] = [...(options?.componentDirs || [])]
     let components = []
-
     nuxt.hook('components:dirs', (dirs) => {
       componentDirs = [
         ...componentDirs,
@@ -52,28 +55,26 @@ export default defineNuxtModule<ModuleOptions>({
       ]
       options.componentDirs = componentDirs
     })
-
     nuxt.hook('components:extend', (_components) => {
       components = _components
       options.components = components
     })
 
-    // Webpack plugin
-    nuxt.hook('webpack:config', (config: any) => {
-      config.plugins = config.plugins || []
-      config.plugins.unshift(unplugin.webpack(options))
-    })
+    // Add useComponentMeta
+    addImportsDir(resolver.resolve('./runtime/composables'))
+
     // Vite plugin
     nuxt.hook('vite:extend', (vite: any) => {
       vite.config.plugins = vite.config.plugins || []
-      vite.config.plugins.push(unplugin.vite(options))
+      vite.config.plugins.push(storagePlugin)
+      vite.config.plugins.push(metaPlugin.vite(options))
     })
 
     // Nitro setup
     nuxt.hook('nitro:config', (nitroConfig) => {
       nitroConfig.handlers = nitroConfig.handlers || []
       nitroConfig.virtual = nitroConfig.virtual || {}
-      nitroConfig.virtual['#meta/virtual/meta'] = () => `export * from '${join(nuxt.options.buildDir, '/component-meta.mjs')}'`
+      nitroConfig.virtual['#meta/virtual/meta'] = () => readFileSync(join(nuxt.options.buildDir, '/component-meta-cache.mjs'), 'utf-8')
     })
     addServerHandler({
       method: 'get',
