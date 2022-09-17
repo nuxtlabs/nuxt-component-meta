@@ -13,7 +13,7 @@ export const META_CACHE_KEY = 'virtual:component-meta'
 interface ComponentReferences {
 }
 
-export const storagePlugin = virtual({
+export const storagePlugin = () => virtual({
   [META_CACHE_KEY]: 'export default {}'
 })
 

@@ -43,6 +43,8 @@
   },
   "build": {
     "externals": [
+      "#nuxt-component-meta",
+      "ufo",
       "pathe",
       "defu",
       "unplugin"

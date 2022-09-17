@@ -67,7 +67,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Vite plugin
     nuxt.hook('vite:extend', (vite: any) => {
       vite.config.plugins = vite.config.plugins || []
-      vite.config.plugins.push(storagePlugin)
+      vite.config.plugins.push(storagePlugin())
       vite.config.plugins.push(metaPlugin.vite(options))
     })
 
