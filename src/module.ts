@@ -9,6 +9,7 @@ import {
 } from '@nuxt/kit'
 import { join } from 'pathe'
 import type { ComponentsDir, ComponentsOptions } from '@nuxt/schema'
+import { withoutLeadingSlash } from 'ufo'
 import type { HookData } from './types'
 import { metaPlugin, storagePlugin } from './unplugin'
 
@@ -68,6 +69,12 @@ export default defineNuxtModule<ModuleOptions>({
       vite.config.plugins = vite.config.plugins || []
       vite.config.plugins.push(storagePlugin)
       vite.config.plugins.push(metaPlugin.vite(options))
+    })
+
+    nuxt.hook('prepare:types', ({ tsConfig }) => {
+      tsConfig.compilerOptions.paths = tsConfig.compilerOptions.paths || {}
+      tsConfig.compilerOptions.paths['#nuxt-component-meta'] = [withoutLeadingSlash(join(nuxt.options.buildDir, '/component-meta-cache.mjs').replace(nuxt.options.rootDir, ''))]
+      // tsConfig.compilerOptions.paths['#nuxt-component-meta/types'] = [withoutLeadingSlash(join(nuxt.options.buildDir, '/component-meta-cache.ts').replace(nuxt.options.rootDir, ''))]
     })
 
     // Nitro setup

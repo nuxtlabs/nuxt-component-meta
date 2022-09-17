@@ -19,7 +19,7 @@ export const storagePlugin = virtual({
 
 export const metaPlugin = createUnplugin<any>(
   (options) => {
-    const outputPath = join(options.outputDir, 'component-meta-cache.mjs')
+    const outputPath = join(options.outputDir, 'component-meta-cache')
 
     /**
      * Initialize component data object from components
@@ -79,11 +79,19 @@ export const metaPlugin = createUnplugin<any>(
     const updateOutput = () => {
       const content = `export default ${getStringifiedComponents()}`
 
+      // Main export of comopnent datas
       writeFileSync(
-        outputPath,
+        outputPath + '.mjs',
         content,
         'utf-8'
       )
+
+      /* We might want to generate typings from components as well.
+      writeFileSync(
+        outputPath + '.ts',
+        `export type ComponentMetaNames = '${Object.keys(components).join('\' |\n\'')}'`
+      )
+      */
 
       updateVirtualModule(storagePlugin, META_CACHE_KEY, content)
     }

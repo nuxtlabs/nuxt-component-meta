@@ -6,11 +6,11 @@ import { useNuxtApp } from '#imports'
 import __componentMeta from '#nuxt-component-meta'
 
 type ComponentMeta = {
-  metas: any
+  meta: any
 }
 
 interface ComponentMetas {
-  [key: string]: ComponentMeta & Omit<Component, 'filePath' | ''>
+  [key: string]: ComponentMeta & Component & { [key: string]: any}
 }
 
 // Workaround for vite HMR with virtual modules
