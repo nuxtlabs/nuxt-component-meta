@@ -46,7 +46,12 @@ importers:
       nuxt-component-meta: link:..
 
   test/fixtures/basic:
-    specifiers: {}
+    specifiers:
+      nuxt: ^3.0.0-rc.10
+      nuxt-component-meta: '*'
+    devDependencies:
+      nuxt: 3.0.0-rc.10
+      nuxt-component-meta: link:../../..
 
 packages:
 
@@ -1451,9 +1456,6 @@ packages:
     resolution: {integrity: sha512-1yn9u2YBQWIgytFMjz4f/t0j43awKytTGVptfd3FtBk76t1pd8mxbek0G/DrnjJhd2V7mSTb5qgnxMYt8Z5iSQ==}
     peerDependencies:
       vue: 3.2.39
-    peerDependenciesMeta:
-      vue:
-        optional: true
     dependencies:
       '@vue/compiler-ssr': 3.2.39
       '@vue/shared': 3.2.39

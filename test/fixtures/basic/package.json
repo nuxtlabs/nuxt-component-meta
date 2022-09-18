@@ -1,4 +1,13 @@
 {
   "private": true,
-  "name": "nuxt-component-meta-playground"
+  "name": "nuxt-component-meta-tests",
+  "devDependencies": {
+    "nuxt": "^3.0.0-rc.10",
+    "nuxt-component-meta": "*"
+  },
+  "scripts": {
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "generate": "nuxi generate"
+  }
 }
