@@ -9,8 +9,9 @@
 1. Add `nuxt-component-meta` dependency to your project:
 
 ```bash
-# Using Yarn
-yarn add --dev nuxt-component-meta
+# Using PNPM
+pnpm add -D nuxt-component-meta
+
 # Using NPM
 npm install --save-dev nuxt-component-meta
 ```
@@ -43,5 +44,5 @@ const { data: meta } = await useAsyncData('my-component', () => $fetch('/api/com
 ## Development
 
 1. Clone this repository
-2. Install dependencies using `yarn install`
-3. Start dev server using `yarn dev`
+2. Install dependencies using `pnpm install`
+3. Start dev server using `pnpm dev`

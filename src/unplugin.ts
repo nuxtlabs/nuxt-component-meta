@@ -6,12 +6,6 @@ import { join } from 'pathe'
 
 export const metaPlugin = createUnplugin<any>(
   (options) => {
-    /*
-    let server: ViteDevServer
-    const VIRTUAL_MODULE_KEY = '#nuxt-component-meta'
-    const RESOLVED_VIRTUAL_MODULE_KEY = '\0' + 'virtual:nuxt-component-meta'
-    */
-
     const outputPath = join(options.outputDir, 'component-meta')
 
     /**
@@ -127,6 +121,7 @@ export const metaPlugin = createUnplugin<any>(
 
         components[component.pascalName] = component
       } catch (e) {
+        // eslint-disable-next-line no-console
         !options?.silent && console.log(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
       }
     }
@@ -138,7 +133,7 @@ export const metaPlugin = createUnplugin<any>(
     updateOutput()
 
     return {
-      name: 'component-meta',
+      name: 'vite-plugin-nuxt-component-meta',
 
       enforce: 'post',
 
