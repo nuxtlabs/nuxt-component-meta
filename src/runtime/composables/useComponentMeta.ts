@@ -1,32 +1,30 @@
 import { reactive } from 'vue'
-import type { Component } from '@nuxt/schema'
 // @ts-ignore
+import { NuxtComponentMeta } from '../../types'
 import { useNuxtApp } from '#imports'
-// @ts-ignore
 import __componentMeta from '#nuxt-component-meta'
-
-type ComponentMeta = {
-  meta: any
-}
-
-interface ComponentMetas {
-  [key: string]: ComponentMeta & Component & { [key: string]: any}
-}
+import type { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
 
 // Workaround for vite HMR with virtual modules
-export const _getComponentMeta = () => __componentMeta as ComponentMetas
+export const _getComponentMeta = () => __componentMeta as NuxtComponentMeta
 
-export function useComponentMeta (): ComponentMetas {
+export function useComponentMeta (name: NuxtComponentMetaNames): NuxtComponentMeta {
   const nuxtApp = useNuxtApp()
+
   if (!nuxtApp._componentMeta) {
-    nuxtApp._componentMeta = reactive(__componentMeta) as ComponentMetas
+    nuxtApp._componentMeta = reactive(__componentMeta) as NuxtComponentMeta
   }
+
+  if (name) {
+    return computed(() => nuxtApp._componentMeta[name])
+  }
+
   return nuxtApp._componentMeta
 }
 
 // HMR Support
 if (process.dev) {
-  function applyHMR (newConfig: ComponentMeta) {
+  function applyHMR (newConfig: NuxtComponentMeta) {
     const componentMetas = useComponentMeta()
     if (newConfig && componentMetas) {
       for (const key in newConfig) {
@@ -42,6 +40,12 @@ if (process.dev) {
 
   // Vite
   if (import.meta.hot) {
-    import.meta.hot.on('component-meta:update', data => applyHMR(data))
+    // Vite
+    if (import.meta.hot) {
+      import.meta.hot.accept((newModule) => {
+        const newMetas = newModule._getComponentMeta()
+        applyHMR(newMetas)
+      })
+    }
   }
 }

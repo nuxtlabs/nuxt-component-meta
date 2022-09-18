@@ -1,25 +1,18 @@
-
 import { writeFileSync } from 'fs'
-import { log } from 'console'
-import { defu } from 'defu'
 import { createUnplugin } from 'unplugin'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import { resolveModule } from '@nuxt/kit'
 import { join } from 'pathe'
-import virtual, { updateVirtualModule } from 'vite-plugin-virtual'
-
-export const META_CACHE_KEY = 'virtual:component-meta'
-
-interface ComponentReferences {
-}
-
-export const storagePlugin = () => virtual({
-  [META_CACHE_KEY]: 'export default {}'
-})
 
 export const metaPlugin = createUnplugin<any>(
   (options) => {
-    const outputPath = join(options.outputDir, 'component-meta-cache')
+    /*
+    let server: ViteDevServer
+    const VIRTUAL_MODULE_KEY = '#nuxt-component-meta'
+    const RESOLVED_VIRTUAL_MODULE_KEY = '\0' + 'virtual:nuxt-component-meta'
+    */
+
+    const outputPath = join(options.outputDir, 'component-meta')
 
     /**
      * Initialize component data object from components
@@ -33,6 +26,7 @@ export const metaPlugin = createUnplugin<any>(
 
           acc[component.pascalName] = {
             ...component,
+            fullPath: filePath,
             filePath: filePath.replace(options.rootDir, ''),
             meta: {
               props: [],
@@ -51,6 +45,8 @@ export const metaPlugin = createUnplugin<any>(
     const getComponents = () => components
 
     const getStringifiedComponents = () => JSON.stringify(getComponents(), null, 2)
+
+    const getVirtualModuleContent = () => `export default ${getStringifiedComponents()}`
 
     let checker
     const refreshChecker = () => {
@@ -77,23 +73,12 @@ export const metaPlugin = createUnplugin<any>(
      * Output is needed for Nitro
      */
     const updateOutput = () => {
-      const content = `export default ${getStringifiedComponents()}`
-
       // Main export of comopnent datas
       writeFileSync(
         outputPath + '.mjs',
-        content,
+        getVirtualModuleContent(),
         'utf-8'
       )
-
-      /* We might want to generate typings from components as well.
-      writeFileSync(
-        outputPath + '.ts',
-        `export type ComponentMetaNames = '${Object.keys(components).join('\' |\n\'')}'`
-      )
-      */
-
-      updateVirtualModule(storagePlugin, META_CACHE_KEY, content)
     }
 
     const fetchComponent = (component: string | any) => {
@@ -102,7 +87,7 @@ export const metaPlugin = createUnplugin<any>(
           if (components[component]) {
             component = components[component]
           } else {
-            component = Object.entries(components).find(([, comp]: any) => (comp.filePath === component))
+            component = Object.entries(components).find(([, comp]: any) => (comp.fullPath === component))
 
             // No component found via string
             if (!component) { return }
@@ -112,9 +97,9 @@ export const metaPlugin = createUnplugin<any>(
         }
 
         // Component is missing required values
-        if (!component?.filePath || !component?.pascalName) { return }
+        if (!component?.fullPath || !component?.pascalName) { return }
 
-        const { props, slots, events, exposed } = checker.getComponentMeta(component.filePath)
+        const { props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
 
         component.meta.slots = slots
         component.meta.events = events
@@ -148,33 +133,22 @@ export const metaPlugin = createUnplugin<any>(
 
     const fetchComponents = () => Object.values(components).forEach(fetchComponent)
 
+    fetchComponents()
+
+    updateOutput()
+
     return {
       name: 'component-meta',
 
       enforce: 'post',
 
       vite: {
-        configureServer () {
-          fetchComponents()
-          updateOutput()
-        },
-        handleHotUpdate ({ file, server }) {
-          if (Object.entries(components).some(([, comp]: any) => comp.filePath === file)) {
+        handleHotUpdate ({ file }) {
+          if (Object.entries(components).some(([, comp]: any) => comp.fullPath === file)) {
             refreshChecker()
             fetchComponent(file)
             updateOutput()
-            server.ws.send({
-              type: 'custom',
-              event: 'component-meta:update',
-              data: getComponents()
-            })
           }
-        }
-      },
-
-      resolveId (id) {
-        if (id.includes('#nuxt-component-meta')) {
-          return id.replace('#nuxt-component-meta', META_CACHE_KEY)
         }
       }
     }

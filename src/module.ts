@@ -5,13 +5,14 @@ import {
   createResolver,
   defineNuxtModule,
   resolveModule,
-  addImportsDir
+  addImportsDir,
+  addTemplate
 } from '@nuxt/kit'
 import { join } from 'pathe'
 import type { ComponentsDir, ComponentsOptions } from '@nuxt/schema'
 import { withoutLeadingSlash } from 'ufo'
 import type { HookData } from './types'
-import { metaPlugin, storagePlugin } from './unplugin'
+import { metaPlugin } from './unplugin'
 
 export interface ModuleOptions {
   outputDir?: string
@@ -21,6 +22,7 @@ export interface ModuleOptions {
   components?: ComponentsOptions[]
   checkerOptions?: MetaCheckerOptions
 }
+
 export interface ModuleHooks {
   'component-meta:parsed'(data: HookData): void
 }
@@ -64,24 +66,49 @@ export default defineNuxtModule<ModuleOptions>({
     // Add useComponentMeta
     addImportsDir(resolver.resolve('./runtime/composables'))
 
+    addTemplate({
+      filename: 'component-meta.mjs',
+      getContents: () => 'export default {}',
+      write: true
+    })
+
+    addTemplate({
+      filename: 'component-meta.d.ts',
+      getContents: () => [
+        "import type { NuxtComponentMeta } from 'nuxt-component-meta'",
+        'export type { NuxtComponentMeta }',
+        `export type NuxtComponentMetaNames = ${components.map((c: { pascalName: any }) => `'${c.pascalName}'`).join(' | ')}`,
+        'declare const components: Record<NuxtComponentMetaNames, NuxtComponentMeta>',
+        'export { components as default,  components }'
+      ].join('\n'),
+      write: true
+    })
+
     // Vite plugin
     nuxt.hook('vite:extend', (vite: any) => {
       vite.config.plugins = vite.config.plugins || []
-      vite.config.plugins.push(storagePlugin())
       vite.config.plugins.push(metaPlugin.vite(options))
     })
 
-    nuxt.hook('prepare:types', ({ tsConfig }) => {
+    // Inject output alias
+    nuxt.options.alias = nuxt.options.alias || {}
+    nuxt.options.alias['#nuxt-component-meta'] = join(nuxt.options.buildDir, 'component-meta.mjs')
+    nuxt.options.alias['#nuxt-component-meta/types'] = join(nuxt.options.buildDir, 'component-meta.d.ts')
+
+    nuxt.hook('prepare:types', ({ tsConfig, references }) => {
+      references.push({
+        path: join(nuxt.options.buildDir, 'component-meta.d.ts')
+      })
       tsConfig.compilerOptions.paths = tsConfig.compilerOptions.paths || {}
-      tsConfig.compilerOptions.paths['#nuxt-component-meta'] = [withoutLeadingSlash(join(nuxt.options.buildDir, '/component-meta-cache.mjs').replace(nuxt.options.rootDir, ''))]
-      // tsConfig.compilerOptions.paths['#nuxt-component-meta/types'] = [withoutLeadingSlash(join(nuxt.options.buildDir, '/component-meta-cache.ts').replace(nuxt.options.rootDir, ''))]
+      tsConfig.compilerOptions.paths['#nuxt-component-meta'] = [withoutLeadingSlash(join(nuxt.options.buildDir, '/component-meta.mjs').replace(nuxt.options.rootDir, ''))]
+      tsConfig.compilerOptions.paths['#nuxt-component-meta/types'] = [withoutLeadingSlash(join(nuxt.options.buildDir, '/component-meta.d.ts').replace(nuxt.options.rootDir, ''))]
     })
 
     // Nitro setup
     nuxt.hook('nitro:config', (nitroConfig) => {
       nitroConfig.handlers = nitroConfig.handlers || []
       nitroConfig.virtual = nitroConfig.virtual || {}
-      nitroConfig.virtual['#meta/virtual/meta'] = () => readFileSync(join(nuxt.options.buildDir, '/component-meta-cache.mjs'), 'utf-8')
+      nitroConfig.virtual['#nuxt-component-meta/nitro'] = () => readFileSync(join(nuxt.options.buildDir, '/component-meta.mjs'), 'utf-8')
     })
     addServerHandler({
       method: 'get',

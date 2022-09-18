@@ -1,7 +1,7 @@
 import { defineEventHandler, createError, appendHeader } from 'h3'
 import { pascalCase } from 'scule'
 // @ts-expect-error - Not resolve from tsconfig
-import components from '#meta/virtual/meta'
+import components from '#nuxt-component-meta/nitro'
 
 export default defineEventHandler((event) => {
   // TODO: Replace via downstream config

@@ -27,7 +27,6 @@
   "dependencies": {
     "@nuxt/kit": "^3.0.0-rc.10",
     "scule": "^0.3.2",
-    "vite-plugin-virtual": "^0.1.1",
     "vue-component-meta": "^0.40.13"
   },
   "devDependencies": {
@@ -37,9 +36,9 @@
     "@nuxt/test-utils": "^3.0.0-rc.10",
     "@nuxtjs/eslint-config-typescript": "latest",
     "eslint": "latest",
-    "nuxt": "^3.0.0-rc.8",
+    "nuxt": "^3.0.0-rc.10",
     "standard-version": "^9.5.0",
-    "vitest": "^0.23.2"
+    "vitest": "^0.23.4"
   },
   "build": {
     "externals": [
