@@ -8,7 +8,7 @@ import type { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
 // Workaround for vite HMR with virtual modules
 export const _getComponentMeta = () => __componentMeta as NuxtComponentMeta
 
-export function useComponentMeta (name: NuxtComponentMetaNames): NuxtComponentMeta {
+export function useComponentMeta (name?: NuxtComponentMetaNames): NuxtComponentMeta {
   const nuxtApp = useNuxtApp()
 
   if (!nuxtApp._componentMeta) {

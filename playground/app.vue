@@ -18,7 +18,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import TestComponent from './components/TestComponent.vue'
 import TestTyped from './components/testTyped.vue'
 
