@@ -11,6 +11,7 @@ import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import type { HookData } from './types'
 
 export interface ModuleOptions {
+  silent?: boolean
   checkerOptions?: MetaCheckerOptions
 }
 export interface ModuleHooks {
@@ -23,6 +24,7 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: 'componentMeta'
   },
   defaults: () => ({
+    silent: true,
     checkerOptions: {
       forceUseTs: true,
       schema: {}
@@ -127,7 +129,7 @@ export default defineNuxtModule<ModuleOptions>({
           // @ts-ignore
           await nuxt.callHook('component-meta:parsed', data)
         } catch (error: any) {
-          console.error(`Unable to parse component "${path}": ${error}`)
+          !options?.silent && console.error(`Unable to parse component "${path}": ${error}`)
         }
 
         return data.meta
