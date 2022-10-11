@@ -42,11 +42,14 @@ export const metaPlugin = createUnplugin<any>(
 
     const getVirtualModuleContent = () => `export default ${getStringifiedComponents()}`
 
-    let checker
+    let checker: ReturnType<typeof createComponentMetaCheckerByJsonConfig>
     const refreshChecker = () => {
-      if (checker?.__internal__?.tsLs) {
-        checker.__internal__.tsLs.dispose()
+      if (checker) {
+        checker.clearCache()
+        checker.reload()
+        return checker
       }
+
       checker = createComponentMetaCheckerByJsonConfig(
         options.rootDir,
         {
@@ -120,6 +123,8 @@ export const metaPlugin = createUnplugin<any>(
           })
 
         components[component.pascalName] = component
+
+        console.log({ component: component.meta })
       } catch (e) {
         // eslint-disable-next-line no-console
         !options?.silent && console.log(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
@@ -140,6 +145,7 @@ export const metaPlugin = createUnplugin<any>(
       vite: {
         handleHotUpdate ({ file }) {
           if (Object.entries(components).some(([, comp]: any) => comp.fullPath === file)) {
+            console.log({ file })
             refreshChecker()
             fetchComponent(file)
             updateOutput()
