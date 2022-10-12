@@ -42,29 +42,19 @@ export const metaPlugin = createUnplugin<any>(
 
     const getVirtualModuleContent = () => `export default ${getStringifiedComponents()}`
 
-    let checker: ReturnType<typeof createComponentMetaCheckerByJsonConfig>
-    const refreshChecker = () => {
-      if (checker) {
-        checker.clearCache()
-        checker.reload()
-        return checker
-      }
-
-      checker = createComponentMetaCheckerByJsonConfig(
-        options.rootDir,
-        {
-          extends: `${options?.rootDir}/tsconfig.json`,
-          skipLibCheck: false,
-          include: [
-            '**/*',
-            ...options?.componentDirs.map(dir => `${typeof dir === 'string' ? dir : (dir?.path || '')}/**/*`)
-          ],
-          exclude: []
-        },
-        options.checkerOptions
-      )
-    }
-    refreshChecker()
+    const checker = createComponentMetaCheckerByJsonConfig(
+      options.rootDir,
+      {
+        extends: `${options?.rootDir}/tsconfig.json`,
+        skipLibCheck: false,
+        include: [
+          '**/*',
+          ...options?.componentDirs.map(dir => `${typeof dir === 'string' ? dir : (dir?.path || '')}/**/*`)
+        ],
+        exclude: []
+      },
+      options.checkerOptions
+    )
 
     /**
      * Output is needed for Nitro
@@ -123,8 +113,6 @@ export const metaPlugin = createUnplugin<any>(
           })
 
         components[component.pascalName] = component
-
-        console.log({ component: component.meta })
       } catch (e) {
         // eslint-disable-next-line no-console
         !options?.silent && console.log(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
@@ -143,10 +131,9 @@ export const metaPlugin = createUnplugin<any>(
       enforce: 'post',
 
       vite: {
-        handleHotUpdate ({ file }) {
+        async handleHotUpdate ({ file, read }) {
           if (Object.entries(components).some(([, comp]: any) => comp.fullPath === file)) {
-            console.log({ file })
-            refreshChecker()
+            checker.updateFile(file, await read())
             fetchComponent(file)
             updateOutput()
           }

@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
+import type { ComputedRef } from 'vue'
 // @ts-ignore
-import { NuxtComponentMeta } from '../../types'
+import { ComponentData, NuxtComponentMeta } from '../../types'
 import { useNuxtApp } from '#imports'
 import __componentMeta from '#nuxt-component-meta'
 import type { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
@@ -8,7 +9,7 @@ import type { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
 // Workaround for vite HMR with virtual modules
 export const _getComponentMeta = () => __componentMeta as NuxtComponentMeta
 
-export function useComponentMeta (name?: NuxtComponentMetaNames): NuxtComponentMeta {
+export function useComponentMeta (name?: NuxtComponentMetaNames): NuxtComponentMeta | ComputedRef<ComponentData> {
   const nuxtApp = useNuxtApp()
 
   if (!nuxtApp._componentMeta) {
@@ -38,8 +39,6 @@ if (process.dev) {
     }
   }
 
-  // Vite
-  if (import.meta.hot) {
     // Vite
     if (import.meta.hot) {
       import.meta.hot.accept((newModule) => {
@@ -47,5 +46,4 @@ if (process.dev) {
         applyHMR(newMetas)
       })
     }
-  }
 }

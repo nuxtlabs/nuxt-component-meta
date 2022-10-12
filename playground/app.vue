@@ -6,15 +6,15 @@
       <TestTyped :hello="`test`" />
     </div>
 
+    <h2>Components from <code>#nuxt-component-meta</code> virtual module</h2>
+
+    <pre>{{ composableData }}</pre>
+
     <h2>Components from <code>/api/component-meta</code> nitro route</h2>
 
     <pre>{{ nitroData }}</pre>
 
     <hr>
-
-    <h2>Components from <code>#nuxt-component-meta</code> virtual module</h2>
-
-    <pre>{{ composableData }}</pre>
   </div>
 </template>
 
