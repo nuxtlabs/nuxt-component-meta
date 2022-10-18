@@ -11,8 +11,6 @@ describe('fixtures:basic', async () => {
   test('List components', async () => {
     const components = await $fetch('/api/component-meta')
 
-    console.log(components)
-
     expect(Object.keys(components).length).greaterThan(0)
 
     Object.keys(components).forEach((name) => {

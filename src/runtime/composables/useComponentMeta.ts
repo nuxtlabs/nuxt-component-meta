@@ -1,49 +1,70 @@
-import { reactive } from 'vue'
-import type { ComputedRef } from 'vue'
+import { reactive, computed } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 // @ts-ignore
 import { ComponentData, NuxtComponentMeta } from '../../types'
-import { useNuxtApp } from '#imports'
-import __componentMeta from '#nuxt-component-meta'
+import { useNuxtApp, useFetch } from '#imports'
 import type { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
 
-// Workaround for vite HMR with virtual modules
-export const _getComponentMeta = () => __componentMeta as NuxtComponentMeta
+// @ts-ignore
+export const __getComponentMeta = async () => {
+  const __metas = await import('#nuxt-component-meta')
+  return __metas?.default || __metas
+}
 
-export function useComponentMeta (name?: NuxtComponentMetaNames): NuxtComponentMeta | ComputedRef<ComponentData> {
+export async function useComponentMeta <T> (componentName?: NuxtComponentMetaNames | Ref<NuxtComponentMetaNames>): Promise<ComputedRef<T extends string ? ComponentData : NuxtComponentMeta>> {
   const nuxtApp = useNuxtApp()
 
-  if (!nuxtApp._componentMeta) {
-    nuxtApp._componentMeta = reactive(__componentMeta) as NuxtComponentMeta
-  }
+  const _componentName = unref(componentName)
 
-  if (name) {
-    return computed(() => nuxtApp._componentMeta[name])
-  }
+  // @ts-ignore
+  if (process.dev) {
+    // Development ; use #nuxt-component-meta virtual module
+    const __componentMeta = await __getComponentMeta()
 
-  return nuxtApp._componentMeta
+    if (!nuxtApp._componentMeta) {
+      nuxtApp._componentMeta = reactive(__componentMeta) as NuxtComponentMeta
+    }
+
+    if (_componentName) {
+      return computed(() => nuxtApp._componentMeta[_componentName])
+    }
+
+    return computed(() => nuxtApp._componentMeta)
+  } else {
+    // Production ; use API to fetch metas
+    const { data } = await useAsyncData(
+      `nuxt-component-meta${_componentName ? `-${_componentName}` : ''}`,
+      () => {
+        return $fetch(`/api/component-meta${_componentName ? `/${_componentName}` : ''}`)
+      }
+    )
+
+    return computed<any>(() => data.value)
+  }
 }
 
 // HMR Support
 if (process.dev) {
-  function applyHMR (newConfig: NuxtComponentMeta) {
-    const componentMetas = useComponentMeta()
-    if (newConfig && componentMetas) {
+  async function applyHMR (newConfig: NuxtComponentMeta) {
+    const componentMetas = await useComponentMeta()
+    if (newConfig && componentMetas.value) {
       for (const key in newConfig) {
-        (componentMetas as any)[key] = (newConfig as any)[key]
+        (componentMetas.value as any)[key] = (newConfig as any)[key]
       }
-      for (const key in componentMetas) {
+      for (const key in componentMetas.value) {
         if (!(key in newConfig)) {
-          delete (componentMetas as any)[key]
+          delete (componentMetas.value as any)[key]
         }
       }
     }
   }
 
-    // Vite
-    if (import.meta.hot) {
-      import.meta.hot.accept((newModule) => {
-        const newMetas = newModule._getComponentMeta()
-        applyHMR(newMetas)
-      })
-    }
+  // Vite
+  if (import.meta.hot) {
+    import.meta.hot.accept(async (newModule) => {
+      const newMetas = await newModule.__getComponentMeta()
+
+      applyHMR(newMetas)
+    })
+  }
 }
