@@ -1,8 +1,9 @@
-import { writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { createUnplugin } from 'unplugin'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import { resolveModule } from '@nuxt/kit'
 import { join } from 'pathe'
+import { ViteDevServer } from 'vite'
 
 export const metaPlugin = createUnplugin<any>(
   (options) => {
@@ -86,6 +87,15 @@ export const metaPlugin = createUnplugin<any>(
         // Component is missing required values
         if (!component?.fullPath || !component?.pascalName) { return }
 
+        // Support transformers
+        if (options?.transformers && options.transformers.length > 0) {
+          let code = readFileSync(component.fullPath, 'utf-8')
+          for (const transform of options.transformers) {
+            code = transform(code, component.fullPath)
+          }
+          checker.updateFile(component.fullPath, code)
+        }
+
         const { props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
 
         component.meta.slots = slots
@@ -119,11 +129,7 @@ export const metaPlugin = createUnplugin<any>(
       }
     }
 
-    const fetchComponents = () => Object.values(components).forEach(fetchComponent)
-
-    fetchComponents()
-
-    updateOutput()
+    const fetchComponents = () => Object.values(components).forEach(component => fetchComponent(component))
 
     return {
       name: 'vite-plugin-nuxt-component-meta',
@@ -131,9 +137,12 @@ export const metaPlugin = createUnplugin<any>(
       enforce: 'post',
 
       vite: {
-        async handleHotUpdate ({ file, read }) {
+        configureServer (_server) {
+          fetchComponents()
+          updateOutput()
+        },
+        handleHotUpdate ({ file }) {
           if (Object.entries(components).some(([, comp]: any) => comp.fullPath === file)) {
-            checker.updateFile(file, await read())
             fetchComponent(file)
             updateOutput()
           }

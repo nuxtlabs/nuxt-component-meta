@@ -21,10 +21,11 @@ export interface ModuleOptions {
   componentDirs: (string | ComponentsDir)[]
   components?: ComponentsOptions[]
   checkerOptions?: MetaCheckerOptions
+  transformers?: ((code, id) => string)[]
 }
 
 export interface ModuleHooks {
-  'component-meta:parsed'(data: HookData): void
+  'component-meta:transformers'(data: HookData): void
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -38,13 +39,22 @@ export default defineNuxtModule<ModuleOptions>({
     componentDirs: [],
     components: [],
     silent: true,
+    transformers: [
+      (code, id) => {
+        return code
+      }
+    ],
     checkerOptions: {
       forceUseTs: true,
       schema: {}
     }
   }),
-  setup (options, nuxt) {
+  async setup (options, nuxt) {
     const resolver = createResolver(import.meta.url)
+
+    // Retrieve transformers
+    const transformers = options?.transformers || []
+    await nuxt.callHook('component-meta:transformers' as any, { transformers })
 
     // Resolve loaded components
     let componentDirs: (string | ComponentsDir)[] = [...(options?.componentDirs || [])]
