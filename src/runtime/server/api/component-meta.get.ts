@@ -3,7 +3,7 @@ import { pascalCase } from 'scule'
 // @ts-expect-error - Not resolve from tsconfig
 import components from '#nuxt-component-meta/nitro'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler((event) => {
   // TODO: Replace via downstream config
   appendHeader(event, 'Access-Control-Allow-Origin', '*')
 
