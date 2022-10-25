@@ -21,7 +21,7 @@ export interface ModuleOptions {
   componentDirs: (string | ComponentsDir)[]
   components?: ComponentsOptions[]
   checkerOptions?: MetaCheckerOptions
-  transformers?: ((code, id) => string)[]
+  transformers?: ((id, code) => string)[]
 }
 
 export interface ModuleHooks {
@@ -40,9 +40,6 @@ export default defineNuxtModule<ModuleOptions>({
     components: [],
     silent: true,
     transformers: [
-      (code, id) => {
-        return code
-      }
     ],
     checkerOptions: {
       forceUseTs: true,

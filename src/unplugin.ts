@@ -3,7 +3,6 @@ import { createUnplugin } from 'unplugin'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import { resolveModule } from '@nuxt/kit'
 import { join } from 'pathe'
-import { ViteDevServer } from 'vite'
 
 export const metaPlugin = createUnplugin<any>(
   (options) => {
@@ -91,7 +90,7 @@ export const metaPlugin = createUnplugin<any>(
         if (options?.transformers && options.transformers.length > 0) {
           let code = readFileSync(component.fullPath, 'utf-8')
           for (const transform of options.transformers) {
-            code = transform(code, component.fullPath)
+            code = transform(component.fullPath, code)
           }
           checker.updateFile(component.fullPath, code)
         }
@@ -129,7 +128,11 @@ export const metaPlugin = createUnplugin<any>(
       }
     }
 
-    const fetchComponents = () => Object.values(components).forEach(component => fetchComponent(component))
+    const fetchComponents = () => Object.values(components).forEach(fetchComponent)
+
+    fetchComponents()
+
+    updateOutput()
 
     return {
       name: 'vite-plugin-nuxt-component-meta',
@@ -137,10 +140,6 @@ export const metaPlugin = createUnplugin<any>(
       enforce: 'post',
 
       vite: {
-        configureServer (_server) {
-          fetchComponents()
-          updateOutput()
-        },
         handleHotUpdate ({ file }) {
           if (Object.entries(components).some(([, comp]: any) => comp.fullPath === file)) {
             fetchComponent(file)
