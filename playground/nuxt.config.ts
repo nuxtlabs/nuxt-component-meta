@@ -5,6 +5,12 @@ export default defineNuxtConfig({
     dirs: [
       {
         path: '~/components/global',
+        prefix: '',
+        global: true
+      },
+      {
+        path: '~/components/pinceau',
+        prefix: '',
         global: true
       },
       '~/components'
@@ -12,6 +18,10 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxt/content',
+    'pinceau/nuxt',
     nuxtMetaModule
-  ]
+  ],
+  pinceau: {
+    followSymbolicLinks: false
+  }
 })

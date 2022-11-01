@@ -1,9 +1,11 @@
 {
   "private": true,
-  "name": "nuxt-component-meta-tests",
+  "name": "nuxt-component-meta-playground",
   "devDependencies": {
+    "@nuxt/content": "npm:@nuxt/content-edge@latest",
     "nuxt": "^3.0.0-rc.12",
-    "nuxt-component-meta": "*"
+    "nuxt-component-meta": "*",
+    "pinceau": "latest"
   },
   "scripts": {
     "dev": "nuxi dev",

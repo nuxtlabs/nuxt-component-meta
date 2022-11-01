@@ -1,5 +1,8 @@
 <template>
   <div>
+    <hr>
+    TestTyped
+    <hr>
     <slot />
     <hr>
     <slot name="nuxt" />

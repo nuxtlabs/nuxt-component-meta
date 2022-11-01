@@ -1,14 +1,31 @@
 <template>
   <div>
-    <h2>Components from <code>/api/component-meta</code> nitro route</h2>
-    <pre>{{ data }}</pre>
-    <hr />
-    <h2>Components from <code>#nuxt-component-meta</code> virtual module</h2>
-    <pre>{{ components }}</pre>
+    <div>
+      <TestComponent foo="test" />
+      <TestGlobalComponent />
+      <TestTyped :hello="`test`" />
+    </div>
+
+    <h2>Components from <code>useComponentMeta('{{ specificComponentName }}')</code></h2>
+
+    <pre>{{ specificComponentMeta }}</pre>
+
+    <h2>Components from <code>useComponentMeta</code></h2>
+
+    <pre>{{ composableData }}</pre>
+
+    <hr>
   </div>
 </template>
 
-<script setup>
-import components from '#nuxt-component-meta'
-const { data } = await useAsyncData('metas', () => $fetch('/api/component-meta'))
+<script lang="ts" setup>
+import TestComponent from './components/TestComponent.vue'
+import TestTyped from './components/testTyped.vue'
+import { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
+
+const specificComponentName = ref<NuxtComponentMetaNames>('TestComponent')
+
+const specificComponentMeta = await useComponentMeta(specificComponentName)
+
+const composableData = await useComponentMeta()
 </script>

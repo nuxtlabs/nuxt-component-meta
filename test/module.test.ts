@@ -10,18 +10,21 @@ describe('fixtures:basic', async () => {
 
   test('List components', async () => {
     const components = await $fetch('/api/component-meta')
+
     expect(Object.keys(components).length).greaterThan(0)
 
     Object.keys(components).forEach((name) => {
-      expect(components[name]).ownProperty('name')
-      expect(components[name]).ownProperty('props')
-      expect(Array.isArray(components[name].props)).toBeTruthy()
-      expect(components[name]).ownProperty('slots')
-      expect(Array.isArray(components[name].slots)).toBeTruthy()
+      expect(components[name]).ownProperty('pascalName')
+      expect(components[name]).ownProperty('meta')
+      expect(components[name].meta).ownProperty('props')
+      expect(Array.isArray(components[name].meta.props)).toBeTruthy()
+      expect(components[name].meta).ownProperty('slots')
+      expect(Array.isArray(components[name].meta.slots)).toBeTruthy()
     })
 
     const testComponent = components.TestComponent
-    expect(testComponent.props).toMatchObject([{
+
+    expect(testComponent.meta.props).toMatchObject([{
       name: 'hello'
     }])
   })
@@ -29,13 +32,14 @@ describe('fixtures:basic', async () => {
   test('Single components', async () => {
     const component = await $fetch('/api/component-meta/test-component')
 
-    expect(component).ownProperty('name')
-    expect(component).ownProperty('props')
-    expect(Array.isArray(component.props)).toBeTruthy()
-    expect(component).ownProperty('slots')
-    expect(Array.isArray(component.slots)).toBeTruthy()
+    expect(component).ownProperty('pascalName')
+    expect(component).ownProperty('meta')
+    expect(component.meta).ownProperty('props')
+    expect(Array.isArray(component.meta.props)).toBeTruthy()
+    expect(component.meta).ownProperty('slots')
+    expect(Array.isArray(component.meta.slots)).toBeTruthy()
 
-    expect(component.props).toMatchObject([{
+    expect(component.meta.props).toMatchObject([{
       name: 'hello'
     }])
   })
@@ -43,11 +47,12 @@ describe('fixtures:basic', async () => {
   test('Global component', async () => {
     const component = await $fetch('/api/component-meta/TestGlobalComponent')
 
-    expect(component).ownProperty('name')
-    expect(component).ownProperty('props')
-    expect(Array.isArray(component.props)).toBeTruthy()
-    expect(component).ownProperty('slots')
-    expect(Array.isArray(component.slots)).toBeTruthy()
+    expect(component).ownProperty('pascalName')
+    expect(component).ownProperty('meta')
+    expect(component.meta).ownProperty('props')
+    expect(Array.isArray(component.meta.props)).toBeTruthy()
+    expect(component.meta).ownProperty('slots')
+    expect(Array.isArray(component.meta.slots)).toBeTruthy()
 
     expect(component).toMatchObject({
       global: true

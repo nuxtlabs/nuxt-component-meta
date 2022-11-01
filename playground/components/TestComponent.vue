@@ -1,16 +1,23 @@
 <template>
   <div>
-    <slot />
     <hr>
+    TestComponent
+    <hr>
+    <slot />
     <slot name="nuxt" />
   </div>
 </template>
 
 <script setup>
 defineProps({
+  /**
+   * The foo property.
+   *
+   * @since v1.0.0
+   */
   foo: {
     type: String,
-    required: true
+    default: 'Hello'
   },
   /**
    * The hello property.
@@ -30,5 +37,6 @@ defineProps({
     default: 1.3
   }
 })
+
 const emit = defineEmits(['change', 'delete'])
 </script>

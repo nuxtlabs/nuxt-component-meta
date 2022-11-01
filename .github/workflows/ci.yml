@@ -19,10 +19,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
-          cache: yarn
-      - run: yarn install
-      - run: yarn dev:prepare
-      - run: yarn lint
-      - run: yarn prepack
-      - run: yarn dev:generate
-      - run: yarn test
+      - uses: pnpm/action-setup@v2.2.2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+      - run: pnpm install
+      - run: pnpm dev:prepare
+      - run: pnpm lint
+      - run: pnpm prepack
+      - run: pnpm dev:generate
+      - run: pnpm test
