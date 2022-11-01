@@ -1,12 +1,12 @@
 <template>
-  <div :class="$pinceau">
+  <div>
     Hello World!
   </div>
 </template>
 
 <script setup lang="ts">
 defineProps({
-  ...$variantsProps
+  ...variants
 })
 </script>
 

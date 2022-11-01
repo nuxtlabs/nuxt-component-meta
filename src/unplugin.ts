@@ -86,14 +86,19 @@ export const metaPlugin = createUnplugin<any>(
         // Component is missing required values
         if (!component?.fullPath || !component?.pascalName) { return }
 
+
+        // Read component code
+        let code = readFileSync(component.fullPath, 'utf-8')
+
         // Support transformers
         if (options?.transformers && options.transformers.length > 0) {
-          let code = readFileSync(component.fullPath, 'utf-8')
           for (const transform of options.transformers) {
             code = transform(component.fullPath, code)
           }
-          checker.updateFile(component.fullPath, code)
         }
+
+        // Ensure file is updated
+        checker.updateFile(component.fullPath, code)
 
         const { props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
 
