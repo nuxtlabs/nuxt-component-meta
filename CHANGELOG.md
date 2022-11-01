@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.3](https://github.com/farnabaz/nuxt-component-meta/compare/v0.2.3...v0.3.3) (2022-11-01)
+
+
+### Features
+
+* **unplugin:** move parsing steps to unplugin ([#43](https://github.com/farnabaz/nuxt-component-meta/issues/43)) ([ae5ae18](https://github.com/farnabaz/nuxt-component-meta/commit/ae5ae18ce28c547aec4ce23eb4acb538b83b004d))
+
+
+### Bug Fixes
+
+* **hmr:** fix hmr; avoid relying on transformers ([75e192b](https://github.com/farnabaz/nuxt-component-meta/commit/75e192b92c7536b786d873a4d91ee6a5207f376d))
+
 ### [0.2.3](https://github.com/farnabaz/nuxt-component-meta/compare/v0.2.2...v0.2.3) (2022-09-20)
 
 ### [0.2.2](https://github.com/nuxtlabs/nuxt-component-meta/compare/v0.2.1...v0.2.2) (2022-08-31)
