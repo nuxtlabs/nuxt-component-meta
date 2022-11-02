@@ -86,7 +86,6 @@ export const metaPlugin = createUnplugin<any>(
         // Component is missing required values
         if (!component?.fullPath || !component?.pascalName) { return }
 
-
         // Read component code
         let code = readFileSync(component.fullPath, 'utf-8')
 
