@@ -1,5 +1,8 @@
 # Nuxt Component Meta
 
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+
 > Gather components metadata on build time and make them available on production
 
 💡 This module depends on `nuxt3`
@@ -40,6 +43,13 @@ npm install --save-dev nuxt-component-meta
 const { data: meta } = await useAsyncData('my-component', () => $fetch('/api/component-meta/my-component'))
 </script>
 ```
+
+<!-- Badges -->
+[npm-version-src]: https://img.shields.io/npm/v/nuxt-component-meta/latest.svg?style=flat&colorA=002438&colorB=28CF8D
+[npm-version-href]: https://npmjs.com/package/nuxt-component-meta
+
+[npm-downloads-src]: https://img.shields.io/npm/dt/nuxt-component-meta.svg?style=flat&colorA=002438&colorB=28CF8D
+[npm-downloads-href]: https://npmjs.com/package/nuxt-component-meta
 
 ## Development
 
