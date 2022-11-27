@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.5](https://github.com/farnabaz/nuxt-component-meta/compare/v0.3.4...v0.3.5) (2022-11-27)
+
+
+### Features
+
+* **transformers:** improve transformers feature ; add @nuxt/content support by default ([93d176c](https://github.com/farnabaz/nuxt-component-meta/commit/93d176c9132bc1ab2c29e22d479c83e8bb594605))
+
 ### [0.3.4](https://github.com/farnabaz/nuxt-component-meta/compare/v0.3.3...v0.3.4) (2022-11-16)
 
 ### [0.3.3](https://github.com/farnabaz/nuxt-component-meta/compare/v0.2.3...v0.3.3) (2022-11-01)
