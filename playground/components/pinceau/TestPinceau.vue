@@ -19,6 +19,7 @@ css({
       },
       blue: {
         background: 'blue',
+        color: '{colors.gray.600}'
       }
     }
   }

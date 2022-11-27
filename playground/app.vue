@@ -23,9 +23,15 @@ import TestComponent from './components/TestComponent.vue'
 import TestTyped from './components/testTyped.vue'
 import { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
 
-const specificComponentName = ref<NuxtComponentMetaNames>('TestComponent')
+const specificComponentName = ref<NuxtComponentMetaNames>('TestContent')
 
 const specificComponentMeta = await useComponentMeta(specificComponentName)
 
 const composableData = await useComponentMeta()
 </script>
+
+<style lang="postcss">
+body {
+  font-size: 12px;
+}
+</style>

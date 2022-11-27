@@ -1,8 +1,8 @@
-import { reactive, computed } from 'vue'
+import { reactive, computed, unref } from 'vue'
 import type { ComputedRef, Ref } from 'vue'
 // @ts-ignore
 import { ComponentData, NuxtComponentMeta } from '../../types'
-import { useNuxtApp, useFetch } from '#imports'
+import { useNuxtApp, useAsyncData } from '#imports'
 import type { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
 
 // @ts-ignore

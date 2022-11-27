@@ -3,6 +3,7 @@ import { createUnplugin } from 'unplugin'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import { resolveModule } from '@nuxt/kit'
 import { join } from 'pathe'
+import { defu } from 'defu'
 
 export const metaPlugin = createUnplugin<any>(
   (options) => {
@@ -13,7 +14,7 @@ export const metaPlugin = createUnplugin<any>(
      */
     const components = {
       ...(options?.components || []).reduce(
-        (acc, component) => {
+        (acc: any, component: any) => {
           if (!component.filePath || !component.pascalName) { return acc }
 
           const filePath = resolveModule(component.filePath, { paths: [options.rootDir] })
@@ -92,7 +93,9 @@ export const metaPlugin = createUnplugin<any>(
         // Support transformers
         if (options?.transformers && options.transformers.length > 0) {
           for (const transform of options.transformers) {
-            code = transform(component.fullPath, code)
+            const transformResult = transform(component, code)
+            component = transformResult?.component || component
+            code = transformResult?.code || code
           }
         }
 
@@ -101,10 +104,21 @@ export const metaPlugin = createUnplugin<any>(
 
         const { props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
 
-        component.meta.slots = slots
-        component.meta.events = events
-        component.meta.exposed = exposed
-        component.meta.props = props
+        component.meta.slots = [
+          ...component.meta.slots,
+          ...slots
+        ]
+        component.meta.events = [
+          ...component.meta.events,
+          ...events
+        ]
+        component.meta.exposed = [
+          ...component.meta.exposed,
+          ...exposed
+        ]
+        component.meta.props = [
+          ...component.meta.props,
+          ...props
           .filter(prop => !prop.global)
           .sort((a, b) => {
           // sort required properties first
@@ -124,6 +138,7 @@ export const metaPlugin = createUnplugin<any>(
 
             return 0
           })
+        ]
 
         components[component.pascalName] = component
       } catch (e) {

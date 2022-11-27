@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 import type { MetaCheckerOptions } from 'vue-component-meta'
 import {
   addServerHandler,
@@ -10,6 +10,7 @@ import {
 } from '@nuxt/kit'
 import { join } from 'pathe'
 import type { ComponentsDir, ComponentsOptions } from '@nuxt/schema'
+import createJITI from 'jiti'
 import { withoutLeadingSlash } from 'ufo'
 import type { HookData } from './types'
 import { metaPlugin } from './unplugin'
@@ -21,7 +22,7 @@ export interface ModuleOptions {
   componentDirs: (string | ComponentsDir)[]
   components?: ComponentsOptions[]
   checkerOptions?: MetaCheckerOptions
-  transformers?: ((id, code) => string)[]
+  transformers?: ((component: any, code: string) => ({ component: any, code: string }))[]
 }
 
 export interface ModuleHooks {
@@ -40,22 +41,44 @@ export default defineNuxtModule<ModuleOptions>({
     components: [],
     silent: true,
     transformers: [
+      // Normalize
+      (component, code) => {
+        if (!code.includes('<script')) {
+          code += `\n<script setup>defineProps()</script>`
+        }
+        return { code, component }
+      },
+      // @nuxt/content support
+      (component, code) => {
+        if (component.fullPath.includes('TestContent')) {
+          code = code.replace(
+            /<ContentSlot(.*)?:use="\$slots\.([a-z]+)"(.*)\/>/gm,
+            (_, before, slotName, rest) => {
+              return `<slot${before}${slotName === 'default' ? '' : `name="${slotName}"`}${rest}/>`
+            }
+          )
+        }
+        return { component, code }
+      }
     ],
     checkerOptions: {
       forceUseTs: true,
       schema: {}
     }
   }),
-  async setup (options, nuxt) {
+  async setup(options, nuxt) {
+    // Regex to match colors.primary.100 in {colors.primary.100}
+
+
     const resolver = createResolver(import.meta.url)
 
     // Retrieve transformers
-    const transformers = options?.transformers || []
-    await nuxt.callHook('component-meta:transformers' as any, { transformers })
+    let transformers = options?.transformers || []
+    transformers = await nuxt.callHook('component-meta:transformers' as any, transformers)
 
     // Resolve loaded components
     let componentDirs: (string | ComponentsDir)[] = [...(options?.componentDirs || [])]
-    let components = []
+    let components: any[] = []
     nuxt.hook('components:dirs', (dirs) => {
       componentDirs = [
         ...componentDirs,
@@ -106,6 +129,7 @@ export default defineNuxtModule<ModuleOptions>({
       references.push({
         path: join(nuxt.options.buildDir, 'component-meta.d.ts')
       })
+      tsConfig.compilerOptions = tsConfig.compilerOptions || {}
       tsConfig.compilerOptions.paths = tsConfig.compilerOptions.paths || {}
       tsConfig.compilerOptions.paths['#nuxt-component-meta'] = [withoutLeadingSlash(join(nuxt.options.buildDir, '/component-meta.mjs').replace(nuxt.options.rootDir, ''))]
       tsConfig.compilerOptions.paths['#nuxt-component-meta/types'] = [withoutLeadingSlash(join(nuxt.options.buildDir, '/component-meta.d.ts').replace(nuxt.options.rootDir, ''))]

@@ -19,9 +19,14 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/content',
     'pinceau/nuxt',
-    nuxtMetaModule
+    nuxtMetaModule as any
   ],
   pinceau: {
-    followSymbolicLinks: false
+    followSymbolicLinks: false,
+    componentMetaSupport: true
+  },
+
+  typescript: {
+    includeWorkspace: true
   }
 })
