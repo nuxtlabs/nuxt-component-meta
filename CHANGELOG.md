@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.7](https://github.com/farnabaz/nuxt-component-meta/compare/v0.3.6...v0.3.7) (2022-12-06)
+
+
+### Features
+
+* **content:** remove rest in content transformer ([4a3d063](https://github.com/farnabaz/nuxt-component-meta/commit/4a3d0630d9d65d06a583a7c2b0a88dcd99a05560))
+
 ### [0.3.6](https://github.com/farnabaz/nuxt-component-meta/compare/v0.3.5...v0.3.6) (2022-12-06)
 
 
