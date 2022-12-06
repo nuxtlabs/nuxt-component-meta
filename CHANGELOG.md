@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.6](https://github.com/farnabaz/nuxt-component-meta/compare/v0.3.5...v0.3.6) (2022-12-06)
+
+
+### Bug Fixes
+
+* **module:** update transformers ([2f57524](https://github.com/farnabaz/nuxt-component-meta/commit/2f57524ec13eb6d19190558cde22227837a6457a))
+
 ### [0.3.5](https://github.com/farnabaz/nuxt-component-meta/compare/v0.3.4...v0.3.5) (2022-11-27)
 
 
