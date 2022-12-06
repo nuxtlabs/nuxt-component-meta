@@ -52,8 +52,8 @@ export default defineNuxtModule<ModuleOptions>({
       (component, code) => {
         code = code.replace(
           /<ContentSlot(.*)?:use="\$slots\.([a-z]+)"(.*)\/>/gm,
-          (_, before, slotName, rest) => {
-            return `<slot${slotName === 'default' ? '' : `name="${slotName}"`} />`
+          (_, _before, slotName, _rest) => {
+            return `<slot ${slotName === 'default' ? '' : `name="${slotName}"`} />`
           }
         )
 
