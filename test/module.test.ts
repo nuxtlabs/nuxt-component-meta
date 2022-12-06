@@ -58,4 +58,23 @@ describe('fixtures:basic', async () => {
       global: true
     })
   })
+
+  test('Test component', async () => {
+    const component = await $fetch('/api/component-meta/TestContent')
+
+    expect(component).ownProperty('pascalName')
+    expect(component).ownProperty('meta')
+    expect(component.meta).ownProperty('props')
+    expect(Array.isArray(component.meta.props)).toBeTruthy()
+    expect(component.meta).ownProperty('slots')
+    expect(Array.isArray(component.meta.slots)).toBeTruthy()
+
+    expect(component).toMatchObject({
+      global: true,
+      pascalName: 'TestContent'
+    })
+    expect(component.meta.slots.length).toBe(2)
+    expect(component.meta.slots[0].name).toBe('title')
+    expect(component.meta.slots[1].name).toBe('default')
+  })
 })
