@@ -44,20 +44,19 @@ export default defineNuxtModule<ModuleOptions>({
       // Normalize
       (component, code) => {
         if (!code.includes('<script')) {
-          code += `\n<script setup>defineProps()</script>`
+          code += '\n<script setup>defineProps()</script>'
         }
         return { code, component }
       },
       // @nuxt/content support
       (component, code) => {
-        if (component.fullPath.includes('TestContent')) {
-          code = code.replace(
-            /<ContentSlot(.*)?:use="\$slots\.([a-z]+)"(.*)\/>/gm,
-            (_, before, slotName, rest) => {
-              return `<slot${before}${slotName === 'default' ? '' : `name="${slotName}"`}${rest}/>`
-            }
-          )
-        }
+        code = code.replace(
+          /<ContentSlot(.*)?:use="\$slots\.([a-z]+)"(.*)\/>/gm,
+          (_, before, slotName, rest) => {
+            return `<slot${before}${slotName === 'default' ? '' : `name="${slotName}"`}${rest}/>`
+          }
+        )
+
         return { component, code }
       }
     ],
@@ -66,9 +65,8 @@ export default defineNuxtModule<ModuleOptions>({
       schema: {}
     }
   }),
-  async setup(options, nuxt) {
+  async setup (options, nuxt) {
     // Regex to match colors.primary.100 in {colors.primary.100}
-
 
     const resolver = createResolver(import.meta.url)
 

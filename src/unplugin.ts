@@ -119,25 +119,25 @@ export const metaPlugin = createUnplugin<any>(
         component.meta.props = [
           ...component.meta.props,
           ...props
-          .filter(prop => !prop.global)
-          .sort((a, b) => {
-          // sort required properties first
-            if (!a.required && b.required) {
-              return 1
-            }
-            if (a.required && !b.required) {
-              return -1
-            }
-            // then ensure boolean properties are sorted last
-            if (a.type === 'boolean' && b.type !== 'boolean') {
-              return 1
-            }
-            if (a.type !== 'boolean' && b.type === 'boolean') {
-              return -1
-            }
+            .filter(prop => !prop.global)
+            .sort((a, b) => {
+              // sort required properties first
+              if (!a.required && b.required) {
+                return 1
+              }
+              if (a.required && !b.required) {
+                return -1
+              }
+              // then ensure boolean properties are sorted last
+              if (a.type === 'boolean' && b.type !== 'boolean') {
+                return 1
+              }
+              if (a.type !== 'boolean' && b.type === 'boolean') {
+                return -1
+              }
 
-            return 0
-          })
+              return 0
+            })
         ]
 
         components[component.pascalName] = component
