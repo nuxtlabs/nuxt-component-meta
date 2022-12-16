@@ -104,41 +104,29 @@ export const metaPlugin = createUnplugin<Required<ModuleOptions>>(
 
         const { props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
 
-        component.meta.slots = [
-          ...component.meta.slots,
-          ...slots
-        ]
-        component.meta.events = [
-          ...component.meta.events,
-          ...events
-        ]
-        component.meta.exposed = [
-          ...component.meta.exposed,
-          ...exposed
-        ]
-        component.meta.props = [
-          ...component.meta.props,
-          ...props
-            .filter(prop => !prop.global)
-            .sort((a, b) => {
-              // sort required properties first
-              if (!a.required && b.required) {
-                return 1
-              }
-              if (a.required && !b.required) {
-                return -1
-              }
-              // then ensure boolean properties are sorted last
-              if (a.type === 'boolean' && b.type !== 'boolean') {
-                return 1
-              }
-              if (a.type !== 'boolean' && b.type === 'boolean') {
-                return -1
-              }
+        component.meta.slots = slots
+        component.meta.events = events
+        component.meta.exposed = exposed
+        component.meta.props = props
+          .filter(prop => !prop.global)
+          .sort((a, b) => {
+            // sort required properties first
+            if (!a.required && b.required) {
+              return 1
+            }
+            if (a.required && !b.required) {
+              return -1
+            }
+            // then ensure boolean properties are sorted last
+            if (a.type === 'boolean' && b.type !== 'boolean') {
+              return 1
+            }
+            if (a.type !== 'boolean' && b.type === 'boolean') {
+              return -1
+            }
 
-              return 0
-            })
-        ]
+            return 0
+          })
 
         components[component.pascalName] = component
       } catch (e) {
