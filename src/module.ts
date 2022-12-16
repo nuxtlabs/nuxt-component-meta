@@ -1,5 +1,4 @@
 import { existsSync, readFileSync } from 'fs'
-import type { MetaCheckerOptions } from 'vue-component-meta'
 import {
   addServerHandler,
   createResolver,
@@ -9,25 +8,12 @@ import {
   addTemplate
 } from '@nuxt/kit'
 import { join } from 'pathe'
-import type { ComponentsDir, ComponentsOptions } from '@nuxt/schema'
-import createJITI from 'jiti'
+import type { ComponentsDir } from '@nuxt/schema'
 import { withoutLeadingSlash } from 'ufo'
-import type { HookData } from './types'
 import { metaPlugin } from './unplugin'
+import { ModuleOptions } from './options'
 
-export interface ModuleOptions {
-  outputDir?: string
-  rootDir?: string
-  silent?: boolean
-  componentDirs: (string | ComponentsDir)[]
-  components?: ComponentsOptions[]
-  checkerOptions?: MetaCheckerOptions
-  transformers?: ((component: any, code: string) => ({ component: any, code: string }))[]
-}
-
-export interface ModuleHooks {
-  'component-meta:transformers'(data: HookData): void
-}
+export * from './options'
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -115,7 +101,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Vite plugin
     nuxt.hook('vite:extend', (vite: any) => {
       vite.config.plugins = vite.config.plugins || []
-      vite.config.plugins.push(metaPlugin.vite(options))
+      vite.config.plugins.push(metaPlugin.vite(options as Required<ModuleOptions>))
     })
 
     // Inject output alias

@@ -1,11 +1,11 @@
-import { readFileSync, writeFileSync } from 'fs'
+import fsp from 'fs/promises'
 import { createUnplugin } from 'unplugin'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import { resolveModule } from '@nuxt/kit'
 import { join } from 'pathe'
-import { defu } from 'defu'
+import { ModuleOptions } from './options'
 
-export const metaPlugin = createUnplugin<any>(
+export const metaPlugin = createUnplugin<Required<ModuleOptions>>(
   (options) => {
     const outputPath = join(options.outputDir, 'component-meta')
 
@@ -60,16 +60,16 @@ export const metaPlugin = createUnplugin<any>(
     /**
      * Output is needed for Nitro
      */
-    const updateOutput = () => {
-      // Main export of comopnent datas
-      writeFileSync(
+    const updateOutput = async () => {
+      // Main export of component data
+      await fsp.writeFile(
         outputPath + '.mjs',
         getVirtualModuleContent(),
         'utf-8'
       )
     }
 
-    const fetchComponent = (component: string | any) => {
+    const fetchComponent = async (component: string | any) => {
       try {
         if (typeof component === 'string') {
           if (components[component]) {
@@ -88,7 +88,7 @@ export const metaPlugin = createUnplugin<any>(
         if (!component?.fullPath || !component?.pascalName) { return }
 
         // Read component code
-        let code = readFileSync(component.fullPath, 'utf-8')
+        let code = await fsp.readFile(component.fullPath, 'utf-8')
 
         // Support transformers
         if (options?.transformers && options.transformers.length > 0) {
@@ -147,22 +147,20 @@ export const metaPlugin = createUnplugin<any>(
       }
     }
 
-    const fetchComponents = () => Object.values(components).forEach(fetchComponent)
-
-    fetchComponents()
-
-    updateOutput()
+    const fetchComponents = () => Promise.all(Object.values(components).map(fetchComponent))
 
     return {
       name: 'vite-plugin-nuxt-component-meta',
-
       enforce: 'post',
-
+      async buildStart () {
+        await fetchComponents()
+        await updateOutput()
+      },
       vite: {
-        handleHotUpdate ({ file }) {
+        async handleHotUpdate ({ file }) {
           if (Object.entries(components).some(([, comp]: any) => comp.fullPath === file)) {
-            fetchComponent(file)
-            updateOutput()
+            await fetchComponent(file)
+            await updateOutput()
           }
         }
       }
