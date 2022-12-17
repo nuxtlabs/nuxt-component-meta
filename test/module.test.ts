@@ -68,7 +68,6 @@ describe('fixtures:basic', async () => {
     expect(Array.isArray(component.meta.props)).toBeTruthy()
     expect(component.meta).ownProperty('slots')
     expect(Array.isArray(component.meta.slots)).toBeTruthy()
-
     expect(component).toMatchObject({
       global: true,
       pascalName: 'TestContent'

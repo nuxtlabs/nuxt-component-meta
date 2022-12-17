@@ -5,9 +5,10 @@ import { HookData } from './types'
 export interface ModuleOptions {
   outputDir?: string
   rootDir?: string
-  silent?: boolean
+  debug?: boolean | 2
   componentDirs: (string | ComponentsDir)[]
   components?: ComponentsOptions[]
+  exclude?: string[]
   checkerOptions?: MetaCheckerOptions
   transformers?: ((component: any, code: string) => ({ component: any; code: string }))[]
 }

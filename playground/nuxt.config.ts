@@ -16,11 +16,17 @@ export default defineNuxtConfig({
       '~/components'
     ]
   },
+
   modules: [
     '@nuxt/content',
     'pinceau/nuxt',
     nuxtMetaModule as any
   ],
+
+  componentMeta: {
+    debug: 2
+  },
+
   pinceau: {
     followSymbolicLinks: false,
     componentMetaSupport: true

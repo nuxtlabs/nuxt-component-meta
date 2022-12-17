@@ -2,10 +2,10 @@
   "private": true,
   "name": "nuxt-component-meta-playground",
   "devDependencies": {
-    "@nuxt/content": "npm:@nuxt/content-edge@latest",
-    "nuxt": "^3.0.0-rc.12",
+    "@nuxt/content": "^2.3.0",
+    "nuxt": "^3.0.0",
     "nuxt-component-meta": "*",
-    "pinceau": "latest"
+    "pinceau": "^0.8.9"
   },
   "scripts": {
     "dev": "nuxi dev",
