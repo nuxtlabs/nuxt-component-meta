@@ -50,7 +50,16 @@ export default defineNuxtModule<ModuleOptions>({
     ],
     checkerOptions: {
       forceUseTs: true,
-      schema: {}
+      schema: {
+        ignore: [
+          'NuxtComponentMetaNames', // avoid loop
+          'RouteLocationRaw', // vue router
+          'RouteLocationPathRaw', // vue router
+          'RouteLocationNamedRaw', // vue router
+          'ComputedStyleProp', // Pinceau
+          'VariantProp' // Pinceau
+        ]
+      }
     }
   }),
   async setup (options, nuxt) {
