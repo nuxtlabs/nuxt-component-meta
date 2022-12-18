@@ -1,14 +1,14 @@
+import fsp from 'fs/promises'
+import { performance } from 'perf_hooks'
 import {
-  resolveModule,
+  resolveModule
 } from '@nuxt/kit'
 import { join } from 'pathe'
-import fsp from 'fs/promises'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
-import { performance } from 'perf_hooks'
-import type { ModuleOptions } from './options'
 import consola from 'consola'
+import type { ModuleOptions } from './options'
 
-export function useComponentMetaParser(
+export function useComponentMetaParser (
   {
     outputDir = join(process.cwd(), '.component-meta/'),
     rootDir = process.cwd(),
@@ -31,7 +31,7 @@ export function useComponentMetaParser(
     ...(_components || []).reduce(
       (acc: any, component: any) => {
         // Locally support exclude as it seem broken from createComponentMetaCheckerByJsonConfig
-        if (exclude.find((excludePath) => component.filePath.includes(excludePath))) { return acc }
+        if (exclude.find(excludePath => component.filePath.includes(excludePath))) { return acc }
 
         if (!component.filePath || !component.pascalName) { return acc }
 
@@ -149,18 +149,17 @@ export function useComponentMetaParser(
 
       components[component.pascalName] = component
     } catch (e) {
-      // eslint-disable-next-line no-console
       !debug && logger.info(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
     }
     const endTime = performance.now()
-    if (debug === 2) logger.success(`${component?.pascalName || component?.filePath || 'a component'} metas parsed in ${(endTime - startTime).toFixed(2)}ms`)
+    if (debug === 2) { logger.success(`${component?.pascalName || component?.filePath || 'a component'} metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
   }
 
   const fetchComponents = async () => {
     const startTime = performance.now()
     await Promise.all(Object.values(components).map(fetchComponent))
     const endTime = performance.now()
-    if (!debug) logger.success(`Components metas parsed in ${(endTime - startTime).toFixed(2)}ms`)
+    if (!debug) { logger.success(`Components metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
   }
 
   return {

@@ -53,7 +53,7 @@ export default defineNuxtModule<ModuleOptions>({
       schema: {}
     }
   }),
-  async setup(options, nuxt) {
+  async setup (options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
     let parser: ComponentMetaParser
