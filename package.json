@@ -43,12 +43,19 @@
     "vue": "^3.2.45"
   },
   "build": {
+    "entries": [
+      {
+        "input": "./src/parser.ts",
+        "name": "parser"
+      }
+    ],
     "externals": [
       "#nuxt-component-meta",
       "ufo",
       "pathe",
       "defu",
-      "unplugin"
+      "unplugin",
+      "consola"
     ]
   },
   "pnpm": {

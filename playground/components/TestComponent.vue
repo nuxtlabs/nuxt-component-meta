@@ -39,4 +39,6 @@ defineProps({
 })
 
 const emit = defineEmits(['change', 'delete'])
+
+const test = {}
 </script>

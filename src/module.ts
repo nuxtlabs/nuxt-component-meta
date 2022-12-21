@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'fs'
+import { readFileSync } from 'fs'
 import {
   addServerHandler,
   createResolver,
@@ -12,6 +12,7 @@ import type { ComponentsDir } from '@nuxt/schema'
 import { withoutLeadingSlash } from 'ufo'
 import { metaPlugin } from './unplugin'
 import { ModuleOptions } from './options'
+import { ComponentMetaParser, useComponentMetaParser } from './parser'
 
 export * from './options'
 
@@ -26,6 +27,7 @@ export default defineNuxtModule<ModuleOptions>({
     componentDirs: [],
     components: [],
     silent: true,
+    exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only'],
     transformers: [
       // Normalize
       (component, code) => {
@@ -48,13 +50,23 @@ export default defineNuxtModule<ModuleOptions>({
     ],
     checkerOptions: {
       forceUseTs: true,
-      schema: {}
+      schema: {
+        ignore: [
+          'NuxtComponentMetaNames', // avoid loop
+          'RouteLocationRaw', // vue router
+          'RouteLocationPathRaw', // vue router
+          'RouteLocationNamedRaw', // vue router
+          'ComputedStyleProp', // Pinceau
+          'VariantProp' // Pinceau
+        ]
+      }
     }
   }),
   async setup (options, nuxt) {
-    // Regex to match colors.primary.100 in {colors.primary.100}
-
     const resolver = createResolver(import.meta.url)
+
+    let parser: ComponentMetaParser
+    let parserReady: Promise<void>
 
     // Retrieve transformers
     let transformers = options?.transformers || []
@@ -75,6 +87,9 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.hook('components:extend', (_components) => {
       components = _components
       options.components = components
+
+      // Create parser after components has been resolved
+      parser = useComponentMetaParser({ ...options, componentDirs, components } as Required<ModuleOptions>)
     })
 
     // Add useComponentMeta
@@ -99,9 +114,10 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     // Vite plugin
-    nuxt.hook('vite:extend', (vite: any) => {
+    nuxt.hook('vite:extend', async (vite: any) => {
+      await parser.updateOutput()
       vite.config.plugins = vite.config.plugins || []
-      vite.config.plugins.push(metaPlugin.vite(options as Required<ModuleOptions>))
+      vite.config.plugins.push(metaPlugin.vite({ parser }))
     })
 
     // Inject output alias
