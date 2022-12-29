@@ -1,9 +1,8 @@
 import fsp from 'fs/promises'
 import { performance } from 'perf_hooks'
-import {
-  resolveModule
-} from '@nuxt/kit'
-import { join } from 'pathe'
+import { existsSync } from 'fs'
+import { dirname, join } from 'pathe'
+import { resolveModule } from '@nuxt/kit'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import consola from 'consola'
 import type { ModuleOptions } from './options'
@@ -55,39 +54,62 @@ export function useComponentMetaParser (
     )
   }
 
-  const getComponents = () => components
-
-  const getStringifiedComponents = () => JSON.stringify(getComponents(), null, 2)
+  const getStringifiedComponents = () => JSON.stringify(components, null, 2)
 
   const getVirtualModuleContent = () => `export default ${getStringifiedComponents()}`
 
-  const checker = createComponentMetaCheckerByJsonConfig(
-    rootDir,
-    {
-      extends: `${rootDir}/tsconfig.json`,
-      skipLibCheck: true,
-      include: [
-        '**/*',
-        ...componentDirs.map(dir => `${typeof dir === 'string' ? dir : (dir?.path || '')}/**/*`)
-      ],
-      exclude
-    },
-    checkerOptions
-  )
+  let checker: ReturnType<typeof createComponentMetaCheckerByJsonConfig>
+  const refreshChecker = () => {
+    checker = createComponentMetaCheckerByJsonConfig(
+      rootDir,
+      {
+        extends: `${rootDir}/tsconfig.json`,
+        skipLibCheck: true,
+        include: [
+          '**/*',
+          ...componentDirs.map(dir => `${typeof dir === 'string' ? dir : (dir?.path || '')}/**/*`)
+        ],
+        exclude
+      },
+      checkerOptions
+    )
+  }
 
   /**
-   * Output is needed for Nitro
+   * Write the output file.
    */
-  const updateOutput = async () => {
-    // Main export of component data
+  const updateOutput = async (content?: string) => {
+    const path = outputPath + '.mjs'
+    if (!existsSync(dirname(path))) { await fsp.mkdir(dirname(path), { recursive: true }) }
+    if (existsSync(path)) { await fsp.unlink(path) }
     await fsp.writeFile(
-      outputPath + '.mjs',
-      getVirtualModuleContent(),
+      path,
+      content || getVirtualModuleContent(),
       'utf-8'
     )
   }
 
+  /**
+   * Stub output file
+   */
+  const stubOutput = async () => {
+    if (existsSync(outputPath + '.mjs')) { return }
+    await updateOutput('export default {}')
+  }
+
+  /**
+   * Fetch a component metas by its file name.
+   */
   const fetchComponent = async (component: string | any) => {
+    // Create the checker at the very last moment and silently fail if unavailable.
+    if (!checker) {
+      try {
+        refreshChecker()
+      } catch (e) {
+        return
+      }
+    }
+
     const startTime = performance.now()
     try {
       if (typeof component === 'string') {
@@ -155,6 +177,9 @@ export function useComponentMetaParser (
     if (debug === 2) { logger.success(`${component?.pascalName || component?.filePath || 'a component'} metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
   }
 
+  /**
+   * Fetch all components metas
+   */
   const fetchComponents = async () => {
     const startTime = performance.now()
     await Promise.all(Object.values(components).map(fetchComponent))
@@ -163,13 +188,18 @@ export function useComponentMetaParser (
   }
 
   return {
-    checker,
+    get checker () {
+      return checker
+    },
+    get components () {
+      return components
+    },
+    refreshChecker,
+    stubOutput,
     outputPath,
     updateOutput,
     fetchComponent,
     fetchComponents,
-    getComponents,
-    components,
     getStringifiedComponents,
     getVirtualModuleContent
   }

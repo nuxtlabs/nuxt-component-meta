@@ -66,7 +66,6 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
 
     let parser: ComponentMetaParser
-    let parserReady: Promise<void>
 
     // Retrieve transformers
     let transformers = options?.transformers || []
@@ -84,12 +83,15 @@ export default defineNuxtModule<ModuleOptions>({
       ]
       options.componentDirs = componentDirs
     })
-    nuxt.hook('components:extend', (_components) => {
+    nuxt.hook('components:extend', async (_components) => {
       components = _components
       options.components = components
 
-      // Create parser after components has been resolved
-      parser = useComponentMetaParser({ ...options, componentDirs, components } as Required<ModuleOptions>)
+      // Create parser once all necessary contexts has been resolved
+      parser = useComponentMetaParser(options)
+
+      // Stub output in case it does not exist yet
+      await parser.stubOutput()
     })
 
     // Add useComponentMeta
@@ -114,10 +116,9 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     // Vite plugin
-    nuxt.hook('vite:extend', async (vite: any) => {
-      await parser.updateOutput()
+    nuxt.hook('vite:extend', (vite: any) => {
       vite.config.plugins = vite.config.plugins || []
-      vite.config.plugins.push(metaPlugin.vite({ parser }))
+      vite.config.plugins.push(metaPlugin.vite({ ...options, parser }))
     })
 
     // Inject output alias
