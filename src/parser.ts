@@ -171,7 +171,7 @@ export function useComponentMetaParser (
 
       components[component.pascalName] = component
     } catch (e) {
-      !debug && logger.info(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
+      debug && logger.info(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
     }
     const endTime = performance.now()
     if (debug === 2) { logger.success(`${component?.pascalName || component?.filePath || 'a component'} metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
