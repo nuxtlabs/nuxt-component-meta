@@ -1,7 +1,7 @@
 import fsp from 'fs/promises'
 import { performance } from 'perf_hooks'
 import { existsSync } from 'fs'
-import { dirname, join } from 'pathe'
+import { dirname, join, relative } from 'pathe'
 import { resolveModule } from '@nuxt/kit'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import consola from 'consola'
@@ -39,7 +39,7 @@ export function useComponentMetaParser (
         acc[component.pascalName] = {
           ...component,
           fullPath: filePath,
-          filePath: filePath.replace(rootDir, ''),
+          filePath: relative(rootDir, filePath),
           meta: {
             props: [],
             slots: [],
