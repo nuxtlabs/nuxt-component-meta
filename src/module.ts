@@ -84,7 +84,7 @@ export default defineNuxtModule<ModuleOptions>({
       options.componentDirs = componentDirs
     })
     nuxt.hook('components:extend', async (_components) => {
-      components = _components
+      components = _components.filter(c => c.global)
       options.components = components
 
       // Create parser once all necessary contexts has been resolved
