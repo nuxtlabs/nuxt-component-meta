@@ -23,6 +23,21 @@ export function useComponentMetaParser (
 
   const outputPath = join(outputDir, 'component-meta')
 
+  const isExcluded = (component: any) => {
+    return exclude.find((excludeRule) => {
+      switch (typeof excludeRule) {
+        case 'string':
+          return component.filePath.includes(excludeRule)
+        case 'object':
+          return excludeRule instanceof RegExp ? excludeRule.test(component.filePath) : false
+        case 'function':
+          return excludeRule(component)
+        default:
+          return false
+      }
+    })
+  }
+
   /**
    * Initialize component data object from components
    */
@@ -30,7 +45,7 @@ export function useComponentMetaParser (
     ...(_components || []).reduce(
       (acc: any, component: any) => {
         // Locally support exclude as it seem broken from createComponentMetaCheckerByJsonConfig
-        if (exclude.find(excludePath => component.filePath.includes(excludePath))) { return acc }
+        if (isExcluded(component)) { return acc }
 
         if (!component.filePath || !component.pascalName) { return acc }
 

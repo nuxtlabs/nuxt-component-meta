@@ -24,7 +24,10 @@ export default defineNuxtConfig({
   ],
 
   componentMeta: {
-    debug: 2
+    debug: 2,
+    exclude: [/test/i, (component: any) => {
+      return component.global
+    }]
   },
 
   pinceau: {
