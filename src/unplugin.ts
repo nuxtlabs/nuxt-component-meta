@@ -14,7 +14,7 @@ export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(
       enforce: 'post',
       async buildStart () {
         // avoid parsing meta twice
-        if (_configResolved && !_configResolved.build.ssr) {
+        if (_configResolved?.build.ssr) {
           return
         }
         await instance.fetchComponents()
