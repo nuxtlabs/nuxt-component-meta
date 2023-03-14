@@ -13,7 +13,7 @@ export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(
       name: 'vite-plugin-nuxt-component-meta',
       enforce: 'post',
       async buildStart () {
-        // avoid parsing meta twice
+        // avoid parsing meta twice in SSR
         if (_configResolved?.build.ssr) {
           return
         }
