@@ -188,12 +188,8 @@ export function useComponentMetaParser (
   }
 
   return {
-    get checker () {
-      return checker
-    },
-    get components () {
-      return components
-    },
+    get checker () { return checker },
+    get components () { return components },
     refreshChecker,
     stubOutput,
     outputPath,
