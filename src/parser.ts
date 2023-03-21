@@ -198,7 +198,7 @@ export function useComponentMetaParser (
     const startTime = performance.now()
     await Promise.all(Object.values(components).map(fetchComponent))
     const endTime = performance.now()
-    if (!debug) { logger.success(`Components metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
+    if (!debug || debug === 2) { logger.success(`Components metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
   }
 
   return {
