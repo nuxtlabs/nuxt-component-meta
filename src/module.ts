@@ -29,13 +29,6 @@ export default defineNuxtModule<ModuleOptions>({
     silent: true,
     exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only'],
     transformers: [
-      // Normalize
-      (component, code) => {
-        if (!code.includes('<script')) {
-          code += '\n<script setup>defineProps()</script>'
-        }
-        return { code, component }
-      },
       // @nuxt/content support
       (component, code) => {
         code = code.replace(
