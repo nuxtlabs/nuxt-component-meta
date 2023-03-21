@@ -29,13 +29,6 @@ export default defineNuxtModule<ModuleOptions>({
     silent: true,
     exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only'],
     transformers: [
-      // Normalize
-      (component, code) => {
-        if (!code.includes('<script')) {
-          code += '\n<script setup>defineProps()</script>'
-        }
-        return { code, component }
-      },
       // @nuxt/content support
       (component, code) => {
         code = code.replace(
@@ -60,7 +53,8 @@ export default defineNuxtModule<ModuleOptions>({
           'VariantProp' // Pinceau
         ]
       }
-    }
+    },
+    globalsOnly: false
   }),
   async setup (options, nuxt) {
     const resolver = createResolver(import.meta.url)
@@ -85,6 +79,10 @@ export default defineNuxtModule<ModuleOptions>({
     })
     nuxt.hook('components:extend', async (_components) => {
       components = _components
+
+      // Support `globalsOnly` option
+      if (options?.globalsOnly) { components = components.filter(c => c.global) }
+
       options.components = components
 
       // Create parser once all necessary contexts has been resolved

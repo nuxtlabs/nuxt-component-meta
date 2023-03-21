@@ -22,7 +22,7 @@ describe('fixtures:basic', async () => {
       expect(Array.isArray(components[name].meta.slots)).toBeTruthy()
     })
 
-    const testComponent = components.TestComponent
+    const testComponent = components.TestGlobalComponent
 
     expect(testComponent.meta.props).toMatchObject([{
       name: 'hello'
@@ -30,7 +30,7 @@ describe('fixtures:basic', async () => {
   })
 
   test('Single components', async () => {
-    const component = await $fetch('/api/component-meta/test-component')
+    const component = await $fetch('/api/component-meta/test-global-component')
 
     expect(component).ownProperty('pascalName')
     expect(component).ownProperty('meta')
