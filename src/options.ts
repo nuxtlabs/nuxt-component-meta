@@ -11,6 +11,7 @@ export interface ModuleOptions {
   exclude?: string[]
   checkerOptions?: MetaCheckerOptions
   transformers?: ((component: any, code: string) => ({ component: any; code: string }))[]
+  globalsOnly?: boolean
 }
 
 export interface ModuleHooks {
