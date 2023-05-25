@@ -16,7 +16,8 @@ export function useComponentMetaParser (
     checkerOptions,
     exclude = [],
     transformers = [],
-    debug = false
+    debug = false,
+    metaFields
   }: ModuleOptions
 ) {
   const logger = consola.withScope('nuxt-component-meta')
@@ -159,10 +160,10 @@ export function useComponentMetaParser (
 
       const { props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
 
-      component.meta.slots = slots
-      component.meta.events = events
-      component.meta.exposed = exposed
-      component.meta.props = props
+      component.meta.slots = metaFields.slots ? slots : []
+      component.meta.events = metaFields.events ? events : []
+      component.meta.exposed = metaFields.exposed ? exposed : []
+      component.meta.props = (metaFields.props ? props : [])
         .filter(prop => !prop.global)
         .sort((a, b) => {
           // sort required properties first

@@ -46,7 +46,16 @@ export interface ModuleOptions {
   /**
    * Filter all components that are not global.
    */
-  globalsOnly?: boolean
+  globalsOnly?: boolean,
+  /**
+   * Filter meta properties to be included in the output.
+   */
+  metaFields: {
+    props: boolean,
+    slots: boolean,
+    events: boolean,
+    exposed: boolean
+  },
 }
 
 export interface ModuleHooks {
