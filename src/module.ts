@@ -28,6 +28,12 @@ export default defineNuxtModule<ModuleOptions>({
     components: [],
     silent: true,
     exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only'],
+    metaFields: {
+      props: true,
+      slots: true,
+      events: true,
+      exposed: true
+    },
     transformers: [
       // @nuxt/content support
       (component, code) => {
