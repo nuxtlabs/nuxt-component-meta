@@ -4,7 +4,7 @@ import { existsSync } from 'fs'
 import { dirname, join, relative } from 'pathe'
 import { resolveModule } from '@nuxt/kit'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
-import consola from 'consola'
+import { consola } from 'consola'
 import type { ModuleOptions } from './options'
 
 export function useComponentMetaParser (
