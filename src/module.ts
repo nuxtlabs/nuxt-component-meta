@@ -134,10 +134,6 @@ export default defineNuxtModule<ModuleOptions>({
       references.push({
         path: join(nuxt.options.buildDir, 'component-meta.d.ts')
       })
-      tsConfig.compilerOptions = tsConfig.compilerOptions || {}
-      tsConfig.compilerOptions.paths = tsConfig.compilerOptions.paths || {}
-      tsConfig.compilerOptions.paths['#nuxt-component-meta'] = [withoutLeadingSlash(join(nuxt.options.buildDir, '/component-meta.mjs').replace(nuxt.options.rootDir, ''))]
-      tsConfig.compilerOptions.paths['#nuxt-component-meta/types'] = [withoutLeadingSlash(join(nuxt.options.buildDir, '/component-meta.d.ts').replace(nuxt.options.rootDir, ''))]
     })
 
     // Nitro setup
