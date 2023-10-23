@@ -1,6 +1,6 @@
-import { MetaCheckerOptions } from 'vue-component-meta'
-import { ComponentsDir, ComponentsOptions } from '@nuxt/schema'
-import { HookData } from './types'
+import type { MetaCheckerOptions } from 'vue-component-meta'
+import type { ComponentsDir, ComponentsOptions } from '@nuxt/schema'
+import type { HookData, ComponentData } from './types'
 
 export interface ModuleOptions {
   /**
@@ -33,6 +33,12 @@ export interface ModuleOptions {
    * Component paths and/or path regexps to be excluded.
    */
   exclude?: (string | RegExp | ((component: any) => boolean))[]
+  /**
+   * Allow to load external components definitions.
+   *
+   * It can be a path to a file exporting a default object of components definitions or an object of components definitions.
+   */
+  sources?: (string | Record<string, ComponentData>)[]
   /**
    * vue-component-meta checker options.
    */

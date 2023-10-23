@@ -9,10 +9,10 @@ import {
 } from '@nuxt/kit'
 import { join } from 'pathe'
 import type { ComponentsDir } from '@nuxt/schema'
-import { withoutLeadingSlash } from 'ufo'
 import { metaPlugin } from './unplugin'
 import { ModuleOptions } from './options'
 import { ComponentMetaParser, useComponentMetaParser } from './parser'
+import { loadExternalSources } from './loader'
 
 export * from './options'
 
@@ -26,6 +26,7 @@ export default defineNuxtModule<ModuleOptions>({
     rootDir: nuxt.options.rootDir,
     componentDirs: [],
     components: [],
+    sources: [],
     silent: true,
     exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only'],
     metaFields: {
@@ -91,8 +92,11 @@ export default defineNuxtModule<ModuleOptions>({
 
       options.components = components
 
+      // Load external components definitions
+      const externalComponents = await loadExternalSources(options.sources)
+
       // Create parser once all necessary contexts has been resolved
-      parser = useComponentMetaParser(options)
+      parser = useComponentMetaParser(options, externalComponents)
 
       // Stub output in case it does not exist yet
       await parser.stubOutput()
