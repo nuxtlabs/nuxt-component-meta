@@ -84,7 +84,8 @@ export function useComponentMetaParser (
         include: [
           '**/*',
           ...componentDirs.map(dir => `${typeof dir === 'string' ? dir : (dir?.path || '')}/**/*`)
-        ]
+        ],
+        exclude: []
       },
       checkerOptions
     )
