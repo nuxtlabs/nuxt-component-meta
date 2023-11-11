@@ -67,7 +67,11 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
 
     let parser: ComponentMetaParser
-    let parserOptions: ComponentMetaParserOptions
+    let parserOptions: ComponentMetaParserOptions = {
+      ...options,
+      components: [],
+      metaSources: {}
+    }
 
     // Retrieve transformers
     let transformers = options?.transformers || []
@@ -95,7 +99,8 @@ export default defineNuxtModule<ModuleOptions>({
       const metaSources = await loadExternalSources(options.metaSources)
 
       // Allow to extend parser options
-      parserOptions = { ...options, components, metaSources }
+      parserOptions.components = components
+      parserOptions.metaSources = metaSources
       parserOptions = await nuxt.callHook('component-meta:extend', parserOptions)
 
       // Create parser once all necessary contexts has been resolved
