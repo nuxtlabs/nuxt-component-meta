@@ -13,6 +13,7 @@ import { metaPlugin } from './unplugin'
 import { ModuleOptions } from './options'
 import { ComponentMetaParser, useComponentMetaParser, type ComponentMetaParserOptions } from './parser'
 import { loadExternalSources } from './loader'
+import { NuxtComponentMeta } from './types'
 
 export * from './options'
 
@@ -80,6 +81,8 @@ export default defineNuxtModule<ModuleOptions>({
     // Resolve loaded components
     let componentDirs: (string | ComponentsDir)[] = [...(options?.componentDirs || [])]
     let components: Component[] = []
+    let metaSources: NuxtComponentMeta = {}
+
     nuxt.hook('components:dirs', (dirs) => {
       componentDirs = [
         ...componentDirs,
@@ -96,7 +99,7 @@ export default defineNuxtModule<ModuleOptions>({
       if (options?.globalsOnly) { components = components.filter(c => c.global) }
 
       // Load external components definitions
-      const metaSources = await loadExternalSources(options.metaSources)
+      metaSources = await loadExternalSources(options.metaSources)
 
       // Allow to extend parser options
       parserOptions.components = components
@@ -122,11 +125,13 @@ export default defineNuxtModule<ModuleOptions>({
     addTemplate({
       filename: 'component-meta.d.ts',
       getContents: () => [
-        "import type { NuxtComponentMeta } from 'nuxt-component-meta'",
-        'export type { NuxtComponentMeta }',
-        `export type NuxtComponentMetaNames = ${components.map(c => `'${c.pascalName}'`).join(' | ')}`,
-        'declare const components: Record<NuxtComponentMetaNames, NuxtComponentMeta>',
-        'export { components as default,  components }'
+        "import type { ComponentData } from 'nuxt-component-meta'",
+        `export type NuxtComponentMetaNames = ${
+          [...components, ...Object.values(metaSources)].map(c => `'${c.pascalName}'`).join(' | ')
+        }`,
+        'export type NuxtComponentMeta = Record<NuxtComponentMetaNames, ComponentData>',
+        'declare const components: NuxtComponentMeta',
+        'export { components as default, components }'
       ].join('\n'),
       write: true
     })
