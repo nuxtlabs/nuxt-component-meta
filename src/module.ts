@@ -26,7 +26,7 @@ export default defineNuxtModule<ModuleOptions>({
     rootDir: nuxt.options.rootDir,
     componentDirs: [],
     components: [],
-    sources: [],
+    metaSources: [],
     silent: true,
     exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only'],
     metaFields: {
@@ -93,7 +93,7 @@ export default defineNuxtModule<ModuleOptions>({
       options.components = components
 
       // Load external components definitions
-      const externalComponents = await loadExternalSources(options.sources)
+      const externalComponents = await loadExternalSources(options.metaSources)
 
       // Create parser once all necessary contexts has been resolved
       parser = useComponentMetaParser(options, externalComponents)

@@ -34,12 +34,6 @@ export interface ModuleOptions {
    */
   exclude?: (string | RegExp | ((component: any) => boolean))[]
   /**
-   * Allow to load external components definitions.
-   *
-   * It can be a path to a file exporting a default object of components definitions or an object of components definitions.
-   */
-  sources?: (string | Record<string, ComponentData>)[]
-  /**
    * vue-component-meta checker options.
    */
   checkerOptions?: MetaCheckerOptions
@@ -62,6 +56,12 @@ export interface ModuleOptions {
     events: boolean,
     exposed: boolean
   },
+  /**
+   * Allow to load external components definitions.
+   *
+   * It can be a path to a file exporting a default object of components definitions or an object of components definitions.
+   */
+  metaSources?: (string | Record<string, ComponentData>)[]
 }
 
 export interface ModuleHooks {
