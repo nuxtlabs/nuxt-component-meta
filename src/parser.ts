@@ -5,8 +5,14 @@ import { dirname, join, relative } from 'pathe'
 import { resolveModule } from '@nuxt/kit'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import consola from 'consola'
+import type { Component } from '@nuxt/schema'
 import type { ModuleOptions } from './options'
-import type { ComponentData } from './types'
+import type { NuxtComponentMeta } from './types'
+
+export type ComponentMetaParserOptions = Omit<ModuleOptions, 'components' | 'metaSources'> & {
+  components: Component[]
+  metaSources?: NuxtComponentMeta
+}
 
 export function useComponentMetaParser (
   {
@@ -18,9 +24,9 @@ export function useComponentMetaParser (
     exclude = [],
     transformers = [],
     debug = false,
-    metaFields
-  }: ModuleOptions,
-  externalComponents: Record<string, ComponentData> = {}
+    metaFields,
+    metaSources = {}
+  }: ComponentMetaParserOptions
 ) {
   const logger = consola.withScope('nuxt-component-meta')
 
@@ -44,10 +50,9 @@ export function useComponentMetaParser (
   /**
    * Initialize component data object from components
    */
-  const components = {
-    ...externalComponents,
+  const components: NuxtComponentMeta = {
     ...(_components || []).reduce(
-      (acc: any, component: any) => {
+      (acc, component) => {
         // Locally support exclude as it seem broken from createComponentMetaCheckerByJsonConfig
         if (isExcluded(component)) { return acc }
 
@@ -69,7 +74,7 @@ export function useComponentMetaParser (
 
         return acc
       },
-      {}
+      metaSources
     )
   }
 

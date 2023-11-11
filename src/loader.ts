@@ -3,13 +3,13 @@ import {
   createResolver,
   logger
 } from '@nuxt/kit'
-import type { ComponentData } from './types'
+import type { NuxtComponentMeta } from './types'
 
 // Resolve external components definitions
-export async function loadExternalSources (sources: Array<Record<string, ComponentData> | string> = []) {
+export async function loadExternalSources (sources: (string | NuxtComponentMeta)[] = []) {
   const resolver = createResolver(import.meta.url)
 
-  const components: Record<string, ComponentData> = {}
+  const components: NuxtComponentMeta = {}
   for (const src of sources) {
     if (typeof src === 'string') {
       try {
@@ -22,7 +22,7 @@ export async function loadExternalSources (sources: Array<Record<string, Compone
         }
 
         // try to load default export
-        const definition: Record<string, ComponentData> = await import(modulePath).then(m => m.default || m)
+        const definition: NuxtComponentMeta = await import(modulePath).then(m => m.default || m)
         for (const [name, meta] of Object.entries(definition)) {
           components[name] = meta
         }

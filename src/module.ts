@@ -8,10 +8,10 @@ import {
   addTemplate
 } from '@nuxt/kit'
 import { join } from 'pathe'
-import type { ComponentsDir } from '@nuxt/schema'
+import type { ComponentsDir, Component } from '@nuxt/schema'
 import { metaPlugin } from './unplugin'
 import { ModuleOptions } from './options'
-import { ComponentMetaParser, useComponentMetaParser } from './parser'
+import { ComponentMetaParser, useComponentMetaParser, type ComponentMetaParserOptions } from './parser'
 import { loadExternalSources } from './loader'
 
 export * from './options'
@@ -67,6 +67,7 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
 
     let parser: ComponentMetaParser
+    let parserOptions: ComponentMetaParserOptions
 
     // Retrieve transformers
     let transformers = options?.transformers || []
@@ -74,7 +75,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     // Resolve loaded components
     let componentDirs: (string | ComponentsDir)[] = [...(options?.componentDirs || [])]
-    let components: any[] = []
+    let components: Component[] = []
     nuxt.hook('components:dirs', (dirs) => {
       componentDirs = [
         ...componentDirs,
@@ -90,13 +91,15 @@ export default defineNuxtModule<ModuleOptions>({
       // Support `globalsOnly` option
       if (options?.globalsOnly) { components = components.filter(c => c.global) }
 
-      options.components = components
-
       // Load external components definitions
-      const externalComponents = await loadExternalSources(options.metaSources)
+      const metaSources = await loadExternalSources(options.metaSources)
+
+      // Allow to extend parser options
+      parserOptions = { ...options, components, metaSources }
+      parserOptions = await nuxt.callHook('component-meta:extend', parserOptions)
 
       // Create parser once all necessary contexts has been resolved
-      parser = useComponentMetaParser(options, externalComponents)
+      parser = useComponentMetaParser(parserOptions)
 
       // Stub output in case it does not exist yet
       await parser.stubOutput()
@@ -116,7 +119,7 @@ export default defineNuxtModule<ModuleOptions>({
       getContents: () => [
         "import type { NuxtComponentMeta } from 'nuxt-component-meta'",
         'export type { NuxtComponentMeta }',
-        `export type NuxtComponentMetaNames = ${components.map((c: { pascalName: any }) => `'${c.pascalName}'`).join(' | ')}`,
+        `export type NuxtComponentMetaNames = ${components.map(c => `'${c.pascalName}'`).join(' | ')}`,
         'declare const components: Record<NuxtComponentMetaNames, NuxtComponentMeta>',
         'export { components as default,  components }'
       ].join('\n'),
@@ -126,7 +129,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Vite plugin
     nuxt.hook('vite:extend', (vite: any) => {
       vite.config.plugins = vite.config.plugins || []
-      vite.config.plugins.push(metaPlugin.vite({ ...options, parser }))
+      vite.config.plugins.push(metaPlugin.vite({ parser, parserOptions }))
     })
 
     // Inject output alias

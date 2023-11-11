@@ -1,12 +1,11 @@
 import { createUnplugin } from 'unplugin'
-import { ModuleOptions } from './options'
-import { ComponentMetaParser, useComponentMetaParser } from './parser'
+import { ComponentMetaParser, useComponentMetaParser, type ComponentMetaParserOptions } from './parser'
 
-type ComponentMetaUnpluginOptions = { parser?: ComponentMetaParser } & ModuleOptions
+type ComponentMetaUnpluginOptions = { parser?: ComponentMetaParser, parserOptions: ComponentMetaParserOptions }
 
 export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(
-  ({ parser, ...options }) => {
-    const instance = (parser || useComponentMetaParser(options)) as ComponentMetaParser
+  ({ parser, parserOptions }) => {
+    const instance = parser || useComponentMetaParser(parserOptions)
     let _configResolved: any
 
     return {

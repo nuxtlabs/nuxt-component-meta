@@ -1,6 +1,6 @@
 import type { MetaCheckerOptions } from 'vue-component-meta'
 import type { ComponentsDir, ComponentsOptions } from '@nuxt/schema'
-import type { HookData, ComponentData } from './types'
+import type { TransformersHookData, ExtendHookData, NuxtComponentMeta } from './types'
 
 export interface ModuleOptions {
   /**
@@ -61,9 +61,10 @@ export interface ModuleOptions {
    *
    * It can be a path to a file exporting a default object of components definitions or an object of components definitions.
    */
-  metaSources?: (string | Record<string, ComponentData>)[]
+  metaSources?: (string | NuxtComponentMeta)[]
 }
 
 export interface ModuleHooks {
-  'component-meta:transformers'(data: HookData): void
+  'component-meta:transformers'(data: TransformersHookData): void
+  'component-meta:extend'(data: ExtendHookData): void
 }
