@@ -28,10 +28,10 @@
     "release": "pnpm test && release-it"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.3.1",
+    "@nuxt/kit": "^3.8.0",
     "citty": "^0.1.4",
     "scule": "^1.0.0",
-    "typescript": "^5.0.2",
+    "typescript": "^5.2.2",
     "vue-component-meta": "^1.8.22"
   },
   "devDependencies": {
