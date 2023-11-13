@@ -1,7 +1,7 @@
 import { writeFile, copyFile, rm } from 'node:fs/promises'
 import { defineCommand } from 'citty'
 import { join, relative, resolve } from 'pathe'
-import pkg from '../../../package.json' assert { type: 'json' }
+import pkg from '../../package.json' assert { type: 'json' }
 import { loadKit } from './utils/kit'
 import { clearBuildDir } from './utils/fs'
 
@@ -24,13 +24,12 @@ export const generate = defineCommand({
   meta: {
     name: pkg.name,
     version: pkg.version,
-    description: 'My Awesome CLI App'
+    description: 'Extract component meta from layers'
   },
   args: {
     rootDir: {
       type: 'positional',
-      description: 'Root Directory',
-      required: true
+      description: 'Root Directory'
     },
     outputDir: {
       type: 'string',
@@ -76,19 +75,11 @@ export const generate = defineCommand({
               return
             }
 
-            // @ts-ignore
-            const module = await import('../../module.mjs').then(m => m.default)
+            const module = await import('../module').then(m => m.default)
 
             installModule(module, {
-              globalsOnly: false,
               debug: 2,
-              exclude: [(component: any) => {
-                return !component.filePath?.startsWith?.(cwd)
-              }],
-              checkerOptions: {
-                forceUseTs: true,
-                schema: false
-              }
+              exclude: ['node_modules'],
             })
           }
         ]

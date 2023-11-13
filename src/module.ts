@@ -29,7 +29,7 @@ export default defineNuxtModule<ModuleOptions>({
     components: [],
     metaSources: [],
     silent: true,
-    exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only'],
+    exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only', '@nuxtjs/mdc/dist/runtime/components/MDC'],
     metaFields: {
       type: true,
       props: true,
@@ -91,7 +91,7 @@ export default defineNuxtModule<ModuleOptions>({
         { path: resolveModule('nuxt').replace('/index.mjs', '/app') },
         { path: resolveModule('@nuxt/ui-templates').replace('/index.mjs', '/templates') }
       ]
-      options.componentDirs = componentDirs
+      parserOptions.componentDirs = componentDirs
     })
     nuxt.hook('components:extend', async (_components) => {
       components = _components

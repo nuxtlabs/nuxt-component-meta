@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
-import { runGenerate } from '../dist/runtime/cli/index.mjs'
+import { runGenerate } from '../dist/cli.mjs'
 
 runGenerate()
