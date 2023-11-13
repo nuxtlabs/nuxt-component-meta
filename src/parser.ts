@@ -1,10 +1,9 @@
-import fsp from 'fs/promises'
+import { writeFile, readFile, unlink, mkdir } from 'fs/promises'
 import { performance } from 'perf_hooks'
 import { existsSync } from 'fs'
 import { dirname, join, relative } from 'pathe'
-import { resolveModule } from '@nuxt/kit'
+import { resolveModule, logger } from '@nuxt/kit'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
-import consola from 'consola'
 import type { Component } from '@nuxt/schema'
 import type { ModuleOptions } from './options'
 import type { NuxtComponentMeta } from './types'
@@ -28,7 +27,7 @@ export function useComponentMetaParser (
     metaSources = {}
   }: ComponentMetaParserOptions
 ) {
-  const logger = consola.withScope('nuxt-component-meta')
+  // const logger = consola.withScope('nuxt-component-meta')
 
   const outputPath = join(outputDir, 'component-meta')
 
@@ -65,6 +64,7 @@ export function useComponentMetaParser (
           fullPath: filePath,
           filePath: relative(rootDir, filePath),
           meta: {
+            type: 0,
             props: [],
             slots: [],
             events: [],
@@ -103,9 +103,9 @@ export function useComponentMetaParser (
    */
   const updateOutput = async (content?: string) => {
     const path = outputPath + '.mjs'
-    if (!existsSync(dirname(path))) { await fsp.mkdir(dirname(path), { recursive: true }) }
-    if (existsSync(path)) { await fsp.unlink(path) }
-    await fsp.writeFile(
+    if (!existsSync(dirname(path))) { await mkdir(dirname(path), { recursive: true }) }
+    if (existsSync(path)) { await unlink(path) }
+    await writeFile(
       path,
       content || getVirtualModuleContent(),
       'utf-8'
@@ -152,7 +152,7 @@ export function useComponentMetaParser (
       if (!component?.fullPath || !component?.pascalName) { return }
 
       // Read component code
-      let code = await fsp.readFile(component.fullPath, 'utf-8')
+      let code = await readFile(component.fullPath, 'utf-8')
 
       // Support transformers
       if (transformers && transformers.length > 0) {
@@ -166,8 +166,9 @@ export function useComponentMetaParser (
       // Ensure file is updated
       checker.updateFile(component.fullPath, code)
 
-      const { props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
+      const { type, props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
 
+      component.meta.type = metaFields.type ? type : 0
       component.meta.slots = metaFields.slots ? slots : []
       component.meta.events = metaFields.events ? events : []
       component.meta.exposed = metaFields.exposed ? exposed : []

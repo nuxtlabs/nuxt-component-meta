@@ -6,7 +6,7 @@ import {
 import type { NuxtComponentMeta } from './types'
 
 // Resolve external components definitions
-export async function loadExternalSources (sources: (string | NuxtComponentMeta)[] = []) {
+export async function loadExternalSources (sources: (string | Partial<NuxtComponentMeta>)[] = []) {
   const resolver = createResolver(import.meta.url)
 
   const components: NuxtComponentMeta = {}
@@ -31,7 +31,9 @@ export async function loadExternalSources (sources: (string | NuxtComponentMeta)
       }
     } else {
       for (const [name, meta] of Object.entries(src)) {
-        components[name] = meta
+        if (meta) {
+          components[name] = meta
+        }
       }
     }
   }

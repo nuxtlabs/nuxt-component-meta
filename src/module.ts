@@ -10,10 +10,10 @@ import {
 import { join } from 'pathe'
 import type { ComponentsDir, Component } from '@nuxt/schema'
 import { metaPlugin } from './unplugin'
-import { ModuleOptions } from './options'
-import { ComponentMetaParser, useComponentMetaParser, type ComponentMetaParserOptions } from './parser'
+import type { ModuleOptions } from './options'
+import { type ComponentMetaParser, useComponentMetaParser, type ComponentMetaParserOptions } from './parser'
 import { loadExternalSources } from './loader'
-import { NuxtComponentMeta } from './types'
+import type { NuxtComponentMeta } from './types'
 
 export * from './options'
 
@@ -31,6 +31,7 @@ export default defineNuxtModule<ModuleOptions>({
     silent: true,
     exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only'],
     metaFields: {
+      type: true,
       props: true,
       slots: true,
       events: true,
@@ -68,7 +69,7 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
 
     let parser: ComponentMetaParser
-    let parserOptions: ComponentMetaParserOptions = {
+    const parserOptions: ComponentMetaParserOptions = {
       ...options,
       components: [],
       metaSources: {}
@@ -104,7 +105,7 @@ export default defineNuxtModule<ModuleOptions>({
       // Allow to extend parser options
       parserOptions.components = components
       parserOptions.metaSources = metaSources
-      parserOptions = await nuxt.callHook('component-meta:extend', parserOptions)
+      await nuxt.callHook('component-meta:extend' as any, parserOptions)
 
       // Create parser once all necessary contexts has been resolved
       parser = useComponentMetaParser(parserOptions)

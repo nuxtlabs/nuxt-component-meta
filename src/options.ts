@@ -51,6 +51,7 @@ export interface ModuleOptions {
    * Filter meta properties to be included in the output.
    */
   metaFields: {
+    type: boolean,
     props: boolean,
     slots: boolean,
     events: boolean,
@@ -61,7 +62,7 @@ export interface ModuleOptions {
    *
    * It can be a path to a file exporting a default object of components definitions or an object of components definitions.
    */
-  metaSources?: (string | NuxtComponentMeta)[]
+  metaSources?: (string | Partial<NuxtComponentMeta>)[]
 }
 
 export interface ModuleHooks {

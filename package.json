@@ -3,6 +3,9 @@
   "version": "0.5.4",
   "license": "MIT",
   "type": "module",
+  "bin": {
+    "nuxt-component-meta": "./bin/nuxt-component-meta.mjs"
+  },
   "exports": {
     ".": {
       "import": "./dist/module.mjs",
@@ -26,9 +29,10 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.3.1",
+    "citty": "^0.1.4",
     "scule": "^1.0.0",
     "typescript": "^5.0.2",
-    "vue-component-meta": "^1.2.0"
+    "vue-component-meta": "^1.8.22"
   },
   "devDependencies": {
     "@iconify/vue": "^4.1.0",
