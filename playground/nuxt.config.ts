@@ -25,9 +25,27 @@ export default defineNuxtConfig({
 
   componentMeta: {
     debug: 2,
-    exclude: [/test/i, (component: any) => {
-      return component.global
-    }]
+    exclude: [/node_modules/i],
+    metaSources: [
+      {
+        TestExternalMeta: {
+          pascalName: 'TestExternalMeta',
+          kebabName: 'test-external-meta',
+          chunkName: 'components/test-external-meta',
+          export: 'default',
+          priority: 1,
+          prefetch: false,
+          preload: false,
+          meta: {
+            type: 0,
+            props: [],
+            slots: [],
+            events: [],
+            exposed: []
+          }
+        }
+      }
+    ]
   },
 
   pinceau: {

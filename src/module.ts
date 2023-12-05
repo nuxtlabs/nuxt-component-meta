@@ -8,11 +8,12 @@ import {
   addTemplate
 } from '@nuxt/kit'
 import { join } from 'pathe'
-import type { ComponentsDir } from '@nuxt/schema'
-import { withoutLeadingSlash } from 'ufo'
+import type { ComponentsDir, Component } from '@nuxt/schema'
 import { metaPlugin } from './unplugin'
-import { ModuleOptions } from './options'
-import { ComponentMetaParser, useComponentMetaParser } from './parser'
+import type { ModuleOptions } from './options'
+import { type ComponentMetaParser, useComponentMetaParser, type ComponentMetaParserOptions } from './parser'
+import { loadExternalSources } from './loader'
+import type { NuxtComponentMeta } from './types'
 
 export * from './options'
 
@@ -26,9 +27,11 @@ export default defineNuxtModule<ModuleOptions>({
     rootDir: nuxt.options.rootDir,
     componentDirs: [],
     components: [],
+    metaSources: [],
     silent: true,
-    exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only'],
+    exclude: ['nuxt/dist/app/components/client-only', 'nuxt/dist/app/components/dev-only', '@nuxtjs/mdc/dist/runtime/components/MDC'],
     metaFields: {
+      type: true,
       props: true,
       slots: true,
       events: true,
@@ -66,6 +69,11 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
 
     let parser: ComponentMetaParser
+    const parserOptions: ComponentMetaParserOptions = {
+      ...options,
+      components: [],
+      metaSources: {}
+    }
 
     // Retrieve transformers
     let transformers = options?.transformers || []
@@ -73,7 +81,9 @@ export default defineNuxtModule<ModuleOptions>({
 
     // Resolve loaded components
     let componentDirs: (string | ComponentsDir)[] = [...(options?.componentDirs || [])]
-    let components: any[] = []
+    let components: Component[] = []
+    let metaSources: NuxtComponentMeta = {}
+
     nuxt.hook('components:dirs', (dirs) => {
       componentDirs = [
         ...componentDirs,
@@ -81,7 +91,7 @@ export default defineNuxtModule<ModuleOptions>({
         { path: resolveModule('nuxt').replace('/index.mjs', '/app') },
         { path: resolveModule('@nuxt/ui-templates').replace('/index.mjs', '/templates') }
       ]
-      options.componentDirs = componentDirs
+      parserOptions.componentDirs = componentDirs
     })
     nuxt.hook('components:extend', async (_components) => {
       components = _components
@@ -89,10 +99,16 @@ export default defineNuxtModule<ModuleOptions>({
       // Support `globalsOnly` option
       if (options?.globalsOnly) { components = components.filter(c => c.global) }
 
-      options.components = components
+      // Load external components definitions
+      metaSources = await loadExternalSources(options.metaSources)
+
+      // Allow to extend parser options
+      parserOptions.components = components
+      parserOptions.metaSources = metaSources
+      await nuxt.callHook('component-meta:extend' as any, parserOptions)
 
       // Create parser once all necessary contexts has been resolved
-      parser = useComponentMetaParser(options)
+      parser = useComponentMetaParser(parserOptions)
 
       // Stub output in case it does not exist yet
       await parser.stubOutput()
@@ -110,11 +126,13 @@ export default defineNuxtModule<ModuleOptions>({
     addTemplate({
       filename: 'component-meta.d.ts',
       getContents: () => [
-        "import type { NuxtComponentMeta } from 'nuxt-component-meta'",
-        'export type { NuxtComponentMeta }',
-        `export type NuxtComponentMetaNames = ${components.map((c: { pascalName: any }) => `'${c.pascalName}'`).join(' | ')}`,
-        'declare const components: Record<NuxtComponentMetaNames, NuxtComponentMeta>',
-        'export { components as default,  components }'
+        "import type { ComponentData } from 'nuxt-component-meta'",
+        `export type NuxtComponentMetaNames = ${
+          [...components, ...Object.values(metaSources)].map(c => `'${c.pascalName}'`).join(' | ')
+        }`,
+        'export type NuxtComponentMeta = Record<NuxtComponentMetaNames, ComponentData>',
+        'declare const components: NuxtComponentMeta',
+        'export { components as default, components }'
       ].join('\n'),
       write: true
     })
@@ -122,7 +140,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Vite plugin
     nuxt.hook('vite:extend', (vite: any) => {
       vite.config.plugins = vite.config.plugins || []
-      vite.config.plugins.push(metaPlugin.vite({ ...options, parser }))
+      vite.config.plugins.push(metaPlugin.vite({ parser, parserOptions }))
     })
 
     // Inject output alias

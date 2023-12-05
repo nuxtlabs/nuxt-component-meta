@@ -21,7 +21,7 @@
 <script lang="ts" setup>
 import TestComponent from './components/TestComponent.vue'
 import TestTyped from './components/testTyped.vue'
-import { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
+import type { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
 
 const specificComponentName = ref<NuxtComponentMetaNames>('TestContent')
 
