@@ -79,7 +79,7 @@ export const generate = defineCommand({
 
             installModule(module, {
               debug: 2,
-              exclude: ['node_modules'],
+              exclude: ['node_modules']
             })
           }
         ]
