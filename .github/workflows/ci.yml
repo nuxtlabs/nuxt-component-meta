@@ -55,6 +55,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - run: pnpm dev:prepare
+
       - name: Release Edge
         run: bash ./.github/scripts/release-edge.sh
         env:
