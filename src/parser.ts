@@ -194,6 +194,10 @@ export function useComponentMetaParser (
           return 0
         })
 
+      component.meta.props = component.meta.props.map(stripeTypeScriptInternalTypesSchema)
+      component.meta.slots = component.meta.slots.map(stripeTypeScriptInternalTypesSchema)
+      component.meta.exposed = component.meta.exposed.map(stripeTypeScriptInternalTypesSchema)
+
       components[component.pascalName] = component
     } catch (e) {
       debug && logger.info(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
@@ -223,6 +227,37 @@ export function useComponentMetaParser (
     fetchComponents,
     getStringifiedComponents,
     getVirtualModuleContent
+  }
+}
+
+function stripeTypeScriptInternalTypesSchema (type: any): any {
+  if (!type) {
+    return type
+  }
+  if (type.declarations && type.declarations.find((d: any) => d.file.includes('node_modules/typescript'))) {
+    return false
+  }
+
+  if (Array.isArray(type)) {
+    return type.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch)).filter(r => r !== false)
+  }
+
+  if (!type.schema) {
+    return type
+  }
+
+  const schema: any = {}
+  Object.keys(type.schema).forEach((sch) => {
+    const res = stripeTypeScriptInternalTypesSchema(type.schema[sch])
+
+    if (res !== false) {
+      schema[sch] = res
+    }
+  })
+
+  return {
+    ...type,
+    schema
   }
 }
 

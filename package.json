@@ -28,25 +28,25 @@
     "release": "pnpm test && release-it"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.8.0",
-    "citty": "^0.1.4",
-    "scule": "^1.0.0",
-    "typescript": "^5.2.2",
-    "vue-component-meta": "^1.8.22"
+    "@nuxt/kit": "^3.9.0",
+    "citty": "^0.1.5",
+    "scule": "^1.1.1",
+    "typescript": "^5.3.3",
+    "vue-component-meta": "^1.8.27"
   },
   "devDependencies": {
     "@iconify/vue": "^4.1.1",
-    "@nuxt/content": "^2.9.0",
-    "@nuxt/module-builder": "^0.5.4",
-    "@nuxt/test-utils": "^3.8.1",
+    "@nuxt/content": "^2.10.0",
+    "@nuxt/module-builder": "^0.5.5",
+    "@nuxt/test-utils": "^3.9.0",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "changelogen": "^0.5.5",
-    "eslint": "^8.53.0",
+    "eslint": "^8.56.0",
     "jiti": "^1.21.0",
-    "nuxt": "^3.8.1",
-    "release-it": "^16.2.1",
-    "vitest": "^0.34.6",
-    "vue": "^3.3.8"
+    "nuxt": "^3.9.0",
+    "release-it": "^17.0.1",
+    "vitest": "^1.1.0",
+    "vue": "^3.3.13"
   },
   "build": {
     "entries": [
