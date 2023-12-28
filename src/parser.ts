@@ -246,6 +246,14 @@ function stripeTypeScriptInternalTypesSchema (type: any): any {
     return type
   }
 
+  if (type.schema.schema) {
+    const res = stripeTypeScriptInternalTypesSchema(type.schema)
+    return {
+      ...type,
+      schema: res
+    }
+  }
+
   const schema: any = {}
   Object.keys(type.schema).forEach((sch) => {
     const res = stripeTypeScriptInternalTypesSchema(type.schema[sch])
