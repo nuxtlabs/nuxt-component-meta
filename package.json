@@ -21,6 +21,12 @@
   "files": [
     "dist"
   ],
+  "keywords": [
+    "vue",
+    "nuxt",
+    "vue component",
+    "nuxt component"
+  ],
   "scripts": {
     "prepack": "nuxt-module-build build",
     "dev": "nuxi dev playground",
