@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "nuxt-component-meta": "./bin/nuxt-component-meta.mjs"
+    "nuxt-component-meta": "bin/nuxt-component-meta.mjs"
   },
   "exports": {
     ".": {
