@@ -4,8 +4,7 @@
   "devDependencies": {
     "@nuxt/content": "^2.3.0",
     "nuxt": "^3.0.0",
-    "nuxt-component-meta": "*",
-    "pinceau": "^0.8.9"
+    "nuxt-component-meta": "*"
   },
   "scripts": {
     "dev": "nuxi dev",

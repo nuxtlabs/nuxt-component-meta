@@ -1,63 +1,36 @@
-name: ci
-
+name: Publish nuxt-component-meta (Nightly)
 on:
   push:
     branches:
       - main
-      - dev
-  pull_request:
-    branches:
-      - main
-      - dev
-
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  nightly:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [20]
 
+    runs-on: ${{ matrix.os }}
+    permissions:
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4 # v4
+      - name: Add pnpm
+        run: corepack enable
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      - uses: pnpm/action-setup@v2.4.0
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 8
-          run_install: false
-      - run: pnpm install
-      - run: pnpm dev:prepare
-      - run: pnpm lint
-      - run: pnpm prepack
-      - run: pnpm dev:generate
-      - run: pnpm test
-
-  release-edge:
-    if: |
-      github.event_name == 'push' &&
-      !contains(github.event.head_commit.message, '[skip-release]') &&
-      !contains(github.event.head_commit.message, 'docs')
-    needs:
-      - test
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-      - uses: pnpm/action-setup@v2.4.0
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 8
+          node-version: 20
+          registry-url: "https://registry.npmjs.org/"
+          cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
-
-      - run: pnpm dev:prepare
-
-      - name: Release Edge
-        run: bash ./.github/scripts/release-edge.sh
+      - name: Prepare
+        run: pnpm dev:prepare
+      - name: Test
+        run: pnpm test
+      - name: Release Nightly
+        run: pnpm changelogen --bump --canary --publish --publishTag nightly
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true

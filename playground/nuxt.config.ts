@@ -8,18 +8,12 @@ export default defineNuxtConfig({
         prefix: '',
         global: true
       },
-      {
-        path: '~/components/pinceau',
-        prefix: '',
-        global: true
-      },
       '~/components'
     ]
   },
 
   modules: [
     '@nuxt/content',
-    'pinceau/nuxt',
     nuxtMetaModule as any
   ],
 
@@ -46,11 +40,6 @@ export default defineNuxtConfig({
         }
       }
     ]
-  },
-
-  pinceau: {
-    followSymbolicLinks: false,
-    componentMetaSupport: true
   },
 
   typescript: {

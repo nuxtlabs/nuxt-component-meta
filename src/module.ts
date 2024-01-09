@@ -63,9 +63,7 @@ export default defineNuxtModule<ModuleOptions>({
           'NuxtComponentMetaNames', // avoid loop
           'RouteLocationRaw', // vue router
           'RouteLocationPathRaw', // vue router
-          'RouteLocationNamedRaw', // vue router
-          'ComputedStyleProp', // Pinceau
-          'VariantProp' // Pinceau
+          'RouteLocationNamedRaw' // vue router
         ]
       }
     },
