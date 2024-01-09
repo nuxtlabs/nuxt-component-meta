@@ -3,6 +3,10 @@
   "version": "0.6.1",
   "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nuxtlabs/nuxt-component-meta.git"
+  },
   "bin": {
     "nuxt-component-meta": "bin/nuxt-component-meta.mjs"
   },
