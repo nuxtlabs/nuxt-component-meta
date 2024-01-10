@@ -152,20 +152,20 @@ export function useComponentMetaParser (
       // Component is missing required values
       if (!component?.fullPath || !component?.pascalName) { return }
 
-      // Read component code
-      let code = await readFile(component.fullPath, 'utf-8')
-
       // Support transformers
       if (transformers && transformers.length > 0) {
+        // Read component code
+        let code = await readFile(component.fullPath, 'utf-8')
+
         for (const transform of transformers) {
           const transformResult = transform(component, code)
           component = transformResult?.component || component
           code = transformResult?.code || code
         }
-      }
 
-      // Ensure file is updated
-      checker.updateFile(component.fullPath, code)
+        // Ensure file is updated
+        checker.updateFile(component.fullPath, code)
+      }
 
       const { type, props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
 
