@@ -52,6 +52,15 @@ export default defineNuxtModule<ModuleOptions>({
             return `<slot ${slotName === 'default' ? '' : `name="${slotName}"`} />`
           }
         )
+        // handle `useSlots` helper & `$slots` alias
+        const name = code.match(/const ([a-zA-Z][a-zA-Z-_0-9]*) = useSlots\(\)/)?.[1] || '$slots'
+        const _slots = code.match(new RegExp(`${name}\\.[a-zA-Z]+`, 'gm'))
+        if (_slots) {
+          const slots = _slots
+            .map(s => s.replace(name + '.', ''))
+            .map(s => `<slot name="${s}" />`)
+          code = code.replace(/<template>/, `<template>\n${slots.join('\n')}\n`)
+        }
 
         return { component, code }
       }
