@@ -52,12 +52,24 @@ export default defineNuxtModule<ModuleOptions>({
             return `<slot ${slotName === 'default' ? '' : `name="${slotName}"`} />`
           }
         )
-        // handle `useSlots` helper & `$slots` alias
-        const name = code.match(/const ([a-zA-Z][a-zA-Z-_0-9]*) = useSlots\(\)/)?.[1] || '$slots'
+        // Handle `(const|let|var) slots = useSlots()`
+        const name = code.match(/(const|let|var) ([a-zA-Z][a-zA-Z-_0-9]*) = useSlots\(\)/)?.[2] || '$slots'
         const _slots = code.match(new RegExp(`${name}\\.[a-zA-Z]+`, 'gm'))
         if (_slots) {
           const slots = _slots
             .map(s => s.replace(name + '.', ''))
+            .map(s => `<slot name="${s}" />`)
+          code = code.replace(/<template>/, `<template>\n${slots.join('\n')}\n`)
+        }
+
+        // Handle `(const|let|var) { title, default: defaultSlot } = useSlots()`
+        const slotNames = code.match(/(const|let|var) {([^}]+)}\s*=\s*useSlots\(\)/)?.[2]
+        // \s*(([a-zA-Z][a-zA-Z-_0-9]*(\s*:\s*[a-zA-Z][a-zA-Z-_0-9]*)?\s*,?\s*)+)\s*
+        if (slotNames) {
+          const slots = slotNames
+            .trim()
+            .split(',')
+            .map(s => s.trim().split(':')[0].trim())
             .map(s => `<slot name="${s}" />`)
           code = code.replace(/<template>/, `<template>\n${slots.join('\n')}\n`)
         }
