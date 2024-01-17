@@ -260,6 +260,16 @@ function stripeTypeScriptInternalTypesSchema (type: any): any {
     }
   }
 
+  if (typeof type.schema !== 'object') {
+    return type
+  }
+
+  if (Array.isArray(type.schema)) {
+    return type.schema
+      .map((sch: any) => stripeTypeScriptInternalTypesSchema(sch))
+      .filter((r: any) => r !== false)
+  }
+
   const schema: any = {}
   Object.keys(type.schema).forEach((sch) => {
     const res = stripeTypeScriptInternalTypesSchema(type.schema[sch])
