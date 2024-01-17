@@ -91,7 +91,13 @@ export function useComponentMetaParser (
         skipLibCheck: true,
         include: [
           '**/*',
-          ...componentDirs.map(dir => `${typeof dir === 'string' ? dir : (dir?.path || '')}/**/*`)
+          ...componentDirs.map((dir) => {
+            const path = typeof dir === 'string' ? dir : (dir?.path || '')
+            if (path.endsWith('.vue')) {
+              return path
+            }
+            return `${path}/**/*`
+          })
         ],
         exclude: []
       },

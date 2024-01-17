@@ -118,6 +118,16 @@ export default defineNuxtModule<ModuleOptions>({
       ]
       parserOptions.componentDirs = componentDirs
     })
+
+    // Add global components path to handle components added with `addComponent` utility
+    nuxt.hook('components:extend', (_components) => {
+      _components.forEach((c) => {
+        if (c.global) {
+          parserOptions.componentDirs.push(c.filePath)
+        }
+      })
+    })
+
     nuxt.hook('components:extend', async (_components) => {
       components = _components
 
