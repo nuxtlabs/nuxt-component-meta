@@ -240,6 +240,7 @@ function stripeTypeScriptInternalTypesSchema (type: any): any {
   if (!type) {
     return type
   }
+
   if (type.declarations && type.declarations.find((d: any) => d.file.includes('node_modules/typescript'))) {
     return false
   }
@@ -248,26 +249,15 @@ function stripeTypeScriptInternalTypesSchema (type: any): any {
     return type.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch)).filter(r => r !== false)
   }
 
-  if (!type.schema) {
-    return type
-  }
-
-  if (type.schema.schema) {
-    const res = stripeTypeScriptInternalTypesSchema(type.schema)
+  if (Array.isArray(type.schema)) {
     return {
       ...type,
-      schema: res
+      schema: type.schema.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch)).filter((r: any) => r !== false)
     }
   }
 
-  if (typeof type.schema !== 'object') {
+  if (!type.schema || typeof type.schema !== 'object') {
     return type
-  }
-
-  if (Array.isArray(type.schema)) {
-    return type.schema
-      .map((sch: any) => stripeTypeScriptInternalTypesSchema(sch))
-      .filter((r: any) => r !== false)
   }
 
   const schema: any = {}
