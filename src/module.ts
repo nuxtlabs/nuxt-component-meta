@@ -41,17 +41,19 @@ export default defineNuxtModule<ModuleOptions>({
       // @nuxt/content support
       (component, code) => {
         code = code.replace(
-          /<ContentSlot(.*)?:use="\$slots\.([a-z]+)"(.*)\/>/gm,
+          /<ContentSlot\s*([^>]*)?:use="\$slots\.([a-zA-Z0-9_]+)"/gm,
           (_, _before, slotName, _rest) => {
-            return `<slot ${slotName === 'default' ? '' : `name="${slotName}"`} />`
+            return `<slot ${_before || ''}${slotName === 'default' ? '' : `name="${slotName}"`}`
           }
         )
         code = code.replace(
-          /<ContentSlot(.*)?name="([a-z]+)"(.*)\/>/gm,
+          /<ContentSlot\s*([^>]*)?name="([a-zA-Z0-9_]+)"/gm,
           (_, _before, slotName, _rest) => {
-            return `<slot ${slotName === 'default' ? '' : `name="${slotName}"`} />`
+            return `<slot ${_before || ''}${slotName === 'default' ? '' : `name="${slotName}"`}`
           }
         )
+        code = code.replace(/<\/ContentSlot>/gm, '</slot>')
+
         // Handle `(const|let|var) slots = useSlots()`
         const name = code.match(/(const|let|var) ([a-zA-Z][a-zA-Z-_0-9]*) = useSlots\(\)/)?.[2] || '$slots'
         const _slots = code.match(new RegExp(`${name}\\.[a-zA-Z]+`, 'gm'))
