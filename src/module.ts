@@ -3,7 +3,7 @@ import {
   addServerHandler,
   createResolver,
   defineNuxtModule,
-  resolveModule,
+  tryResolveModule,
   addImportsDir,
   addTemplate
 } from '@nuxt/kit'
@@ -111,13 +111,16 @@ export default defineNuxtModule<ModuleOptions>({
     let components: Component[] = []
     let metaSources: NuxtComponentMeta = {}
 
+    const uiTemplatesPath = await tryResolveModule('@nuxt/ui-templates')
     nuxt.hook('components:dirs', (dirs) => {
       componentDirs = [
         ...componentDirs,
         ...dirs,
-        { path: resolveModule('nuxt').replace('/index.mjs', '/app') },
-        { path: resolveModule('@nuxt/ui-templates').replace('/index.mjs', '/templates') }
+        { path: nuxt.options.appDir }
       ]
+      if (uiTemplatesPath) {
+        componentDirs.push({ path: uiTemplatesPath.replace('/index.mjs', '/templates') })
+      }
       parserOptions.componentDirs = componentDirs
     })
 
