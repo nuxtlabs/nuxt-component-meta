@@ -253,12 +253,13 @@ function stripeTypeScriptInternalTypesSchema (type: any): any {
   if (Array.isArray(type.schema)) {
     return {
       ...type,
+      declarations: undefined,
       schema: type.schema.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch)).filter((r: any) => r !== false)
     }
   }
 
   if (!type.schema || typeof type.schema !== 'object') {
-    return type
+    return typeof type === 'object' ? { ...type, declarations: undefined } : type
   }
 
   const schema: any = {}
@@ -266,9 +267,9 @@ function stripeTypeScriptInternalTypesSchema (type: any): any {
     if (sch === 'schema' && type.schema[sch]) {
       schema[sch] = schema[sch] || {}
       Object.keys(type.schema[sch]).forEach((sch2) => {
-        const res = stripeTypeScriptInternalTypesSchema(type.schema[sch][sch2]);
+        const res = stripeTypeScriptInternalTypesSchema(type.schema[sch][sch2])
         if (res !== false) {
-          schema[sch][sch2] = res;
+          schema[sch][sch2] = res
         }
       })
       return
@@ -282,6 +283,7 @@ function stripeTypeScriptInternalTypesSchema (type: any): any {
 
   return {
     ...type,
+    declarations: undefined,
     schema
   }
 }
