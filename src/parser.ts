@@ -259,7 +259,7 @@ function stripeTypeScriptInternalTypesSchema (type: any): any {
   }
 
   if (!type.schema || typeof type.schema !== 'object') {
-    return type
+    return typeof type === 'object' ? { ...type, declarations: undefined } : type
   }
 
   const schema: any = {}
