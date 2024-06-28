@@ -203,6 +203,7 @@ export function useComponentMetaParser (
       component.meta.props = component.meta.props.map(stripeTypeScriptInternalTypesSchema)
       component.meta.slots = component.meta.slots.map(stripeTypeScriptInternalTypesSchema)
       component.meta.exposed = component.meta.exposed.map(stripeTypeScriptInternalTypesSchema)
+      component.meta.events = component.meta.events.map(stripeTypeScriptInternalTypesSchema)
 
       components[component.pascalName] = component
     } catch (e) {
