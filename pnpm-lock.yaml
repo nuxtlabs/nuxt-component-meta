@@ -48,6 +48,9 @@ importers:
       eslint:
         specifier: ^8.56.0
         version: 8.56.0
+      jiti:
+        specifier: ^1.21.0
+        version: 1.21.0
       nuxt:
         specifier: ^3.9.1
         version: 3.9.1(@parcel/watcher@2.3.0)(@types/node@20.10.5)(encoding@0.1.13)(eslint@8.56.0)(optionator@0.9.3)(rollup@4.9.1)(terser@5.26.0)(typescript@5.3.3)(vite@5.0.11(@types/node@20.10.5)(terser@5.26.0))
