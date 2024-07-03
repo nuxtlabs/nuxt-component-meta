@@ -2,9 +2,10 @@ import { writeFile, readFile, unlink, mkdir } from 'fs/promises'
 import { performance } from 'perf_hooks'
 import { existsSync } from 'fs'
 import { dirname, join, relative } from 'pathe'
-import { resolveModule, logger } from '@nuxt/kit'
+import { logger } from '@nuxt/kit'
 import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
 import type { Component } from '@nuxt/schema'
+import { resolvePathSync } from 'mlly'
 import type { ModuleOptions } from './options'
 import type { NuxtComponentMeta } from './types'
 
@@ -49,33 +50,26 @@ export function useComponentMetaParser (
   /**
    * Initialize component data object from components
    */
-  const components: NuxtComponentMeta = {
-    ...(_components || []).reduce(
-      (acc, component) => {
-        // Locally support exclude as it seem broken from createComponentMetaCheckerByJsonConfig
-        if (isExcluded(component)) { return acc }
+  const components: NuxtComponentMeta = { ...metaSources }
+  for (const component of _components || []) {
+    // Locally support exclude as it seem broken from createComponentMetaCheckerByJsonConfig
+    if (isExcluded(component)) { continue }
+    if (!component.filePath || !component.pascalName) { continue }
 
-        if (!component.filePath || !component.pascalName) { return acc }
+    const filePath = resolvePathSync(component.filePath)
 
-        const filePath = resolveModule(component.filePath, { paths: [rootDir] })
-
-        acc[component.pascalName] = {
-          ...component,
-          fullPath: filePath,
-          filePath: relative(rootDir, filePath),
-          meta: {
-            type: 0,
-            props: [],
-            slots: [],
-            events: [],
-            exposed: []
-          }
-        }
-
-        return acc
-      },
-      metaSources
-    )
+    components[component.pascalName] = {
+      ...component,
+      fullPath: filePath,
+      filePath: relative(rootDir, filePath),
+      meta: {
+        type: 0,
+        props: [],
+        slots: [],
+        events: [],
+        exposed: []
+      }
+    }
   }
 
   const getStringifiedComponents = () => JSON.stringify(components, null, 2)
