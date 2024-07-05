@@ -40,6 +40,7 @@
   "dependencies": {
     "@nuxt/kit": "^3.9.1",
     "citty": "^0.1.5",
+    "mlly": "^1.7.1",
     "scule": "^1.1.1",
     "typescript": "^5.3.3",
     "vue-component-meta": "^1.8.27"
@@ -76,7 +77,6 @@
       "defu",
       "unplugin",
       "consola",
-      "mlly",
       "acorn",
       "pkg-types",
       "jsonc-parser"
