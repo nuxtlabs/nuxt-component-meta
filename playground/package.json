@@ -4,7 +4,7 @@
   "devDependencies": {
     "@nuxt/content": "^2.3.0",
     "nuxt": "^3.0.0",
-    "nuxt-component-meta": "*"
+    "nuxt-component-meta": "link:.."
   },
   "scripts": {
     "dev": "nuxi dev",

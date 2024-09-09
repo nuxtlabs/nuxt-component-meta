@@ -3,7 +3,7 @@ import { performance } from 'perf_hooks'
 import { existsSync } from 'fs'
 import { dirname, join, relative } from 'pathe'
 import { logger } from '@nuxt/kit'
-import { createComponentMetaCheckerByJsonConfig } from 'vue-component-meta'
+import { createCheckerByJson } from 'vue-component-meta'
 import type { Component } from '@nuxt/schema'
 import { resolvePathSync } from 'mlly'
 import type { ModuleOptions } from './options'
@@ -52,7 +52,7 @@ export function useComponentMetaParser (
    */
   const components: NuxtComponentMeta = { ...metaSources }
   for (const component of _components || []) {
-    // Locally support exclude as it seem broken from createComponentMetaCheckerByJsonConfig
+    // Locally support exclude as it seem broken from createCheckerByJson
     if (isExcluded(component)) { continue }
     if (!component.filePath || !component.pascalName) { continue }
 
@@ -76,9 +76,9 @@ export function useComponentMetaParser (
 
   const getVirtualModuleContent = () => `export default ${getStringifiedComponents()}`
 
-  let checker: ReturnType<typeof createComponentMetaCheckerByJsonConfig>
+  let checker: ReturnType<typeof createCheckerByJson>
   const refreshChecker = () => {
-    checker = createComponentMetaCheckerByJsonConfig(
+    checker = createCheckerByJson(
       rootDir,
       {
         extends: `${rootDir}/tsconfig.json`,
