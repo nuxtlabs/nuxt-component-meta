@@ -73,13 +73,16 @@ export function useComponentMetaParser (
   }
 
   const getStringifiedComponents = () => {
-    const _components = Object.keys(components).map((key) => ({
-      ...components[key],
-      fullPath: undefined,
-      shortPath: undefined,
-      export: undefined
-    }))
-    return JSON.stringify(_components, null, 2)
+    const _components = Object.keys(components).map((key) => ([
+      key,
+      {
+        ...components[key],
+        fullPath: undefined,
+        shortPath: undefined,
+        export: undefined
+      }
+    ]))
+    return JSON.stringify(Object.fromEntries(_components), null, 2)
   }
 
   const getVirtualModuleContent = () => `export default ${getStringifiedComponents()}`
