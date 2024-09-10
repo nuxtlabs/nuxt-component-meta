@@ -9,12 +9,11 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   hello: {
     type: String,
     default: 'Hello'
   }
 })
-const emit = defineEmits(['change', 'delete'])
-
+defineEmits(['change', 'delete'])
 </script>

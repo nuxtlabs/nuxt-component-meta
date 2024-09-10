@@ -72,7 +72,15 @@ export function useComponentMetaParser (
     }
   }
 
-  const getStringifiedComponents = () => JSON.stringify(components, null, 2)
+  const getStringifiedComponents = () => {
+    const _components = Object.keys(components).map((key) => ({
+      ...components[key],
+      fullPath: undefined,
+      shortPath: undefined,
+      export: undefined
+    }))
+    return JSON.stringify(_components, null, 2)
+  }
 
   const getVirtualModuleContent = () => `export default ${getStringifiedComponents()}`
 
@@ -199,6 +207,9 @@ export function useComponentMetaParser (
       component.meta.exposed = component.meta.exposed.map(stripeTypeScriptInternalTypesSchema)
       component.meta.events = component.meta.events.map(stripeTypeScriptInternalTypesSchema)
 
+      // Remove descriptional fileds to reduce chunk size
+      removeFields(component.meta, ['declarations'])
+
       components[component.pascalName] = component
     } catch (e) {
       debug && logger.info(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
@@ -229,6 +240,25 @@ export function useComponentMetaParser (
     getStringifiedComponents,
     getVirtualModuleContent
   }
+}
+
+function removeFields(obj: Record<string, any>, fieldsToRemove: string[]): any {
+  // Check if the obj is an object or array, otherwise return it as-is
+  if (obj && typeof obj === 'object') {
+    // Handle the object and its children recursively
+    for (const key in obj) {
+      // If the key is in fieldsToRemove, delete it
+      if (fieldsToRemove.includes(key)) {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete obj[key];
+      } else if (typeof obj[key] === 'object') {
+        // If the value is an object (or array), recurse into it
+        removeFields(obj[key], fieldsToRemove);
+      }
+    }
+  }
+  
+  return obj;
 }
 
 function stripeTypeScriptInternalTypesSchema (type: any): any {

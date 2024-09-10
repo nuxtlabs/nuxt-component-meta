@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 
-const props = defineProps({
+defineProps({
   stringProp: {
     type: String,
     default: 'Hello'
@@ -39,5 +39,5 @@ const props = defineProps({
     default: () => ({})
   }
 })
-const emit = defineEmits(['change', 'delete'])
+defineEmits(['change', 'delete'])
 </script>

@@ -1,7 +1,7 @@
 import { reactive, computed, unref } from 'vue'
 import type { ComputedRef, Ref } from 'vue'
 // @ts-ignore
-import { ComponentData, NuxtComponentMeta } from '../../types'
+import type { ComponentData, NuxtComponentMeta } from '../../types'
 import { useNuxtApp, useAsyncData } from '#imports'
 import type { NuxtComponentMetaNames } from '#nuxt-component-meta/types'
 
@@ -17,7 +17,7 @@ export async function useComponentMeta <T> (componentName?: NuxtComponentMetaNam
   const _componentName = unref(componentName)
 
   // @ts-ignore
-  if (process.dev) {
+  if (import.meta.dev) {
     // Development ; use #nuxt-component-meta virtual module
     const __componentMeta = await __getComponentMeta()
 
@@ -44,7 +44,7 @@ export async function useComponentMeta <T> (componentName?: NuxtComponentMetaNam
 }
 
 // HMR Support
-if (process.dev) {
+if (import.meta.dev) {
   async function applyHMR (newConfig: NuxtComponentMeta) {
     const componentMetas = await useComponentMeta()
     if (newConfig && componentMetas.value) {
@@ -53,6 +53,7 @@ if (process.dev) {
       }
       for (const key in componentMetas.value) {
         if (!(key in newConfig)) {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete (componentMetas.value as any)[key]
         }
       }

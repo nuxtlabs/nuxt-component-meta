@@ -13,7 +13,7 @@ import type { PropType, defineComponent, type SlotsType } from 'vue'
 export default defineComponent({
   name: 'TextDefine',
   slots: Object as SlotsType<{
-    default: {}
+    default: any
   }>,
   props: {
     title: {

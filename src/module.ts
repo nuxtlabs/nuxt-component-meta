@@ -95,16 +95,18 @@ export default defineNuxtModule<ModuleOptions>({
   async setup (options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    let parser: ComponentMetaParser
-    const parserOptions: ComponentMetaParserOptions = {
-      ...options,
-      components: [],
-      metaSources: {}
-    }
 
     // Retrieve transformers
     let transformers = options?.transformers || []
     transformers = await nuxt.callHook('component-meta:transformers' as any, transformers)
+
+    let parser: ComponentMetaParser
+    const parserOptions: ComponentMetaParserOptions = {
+      ...options,
+      components: [],
+      metaSources: {},
+      transformers
+    }
 
     // Resolve loaded components
     let componentDirs: (string | ComponentsDir)[] = [...(options?.componentDirs || [])]
@@ -188,7 +190,7 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#nuxt-component-meta'] = join(nuxt.options.buildDir, 'component-meta.mjs')
     nuxt.options.alias['#nuxt-component-meta/types'] = join(nuxt.options.buildDir, 'component-meta.d.ts')
 
-    nuxt.hook('prepare:types', ({ tsConfig, references }) => {
+    nuxt.hook('prepare:types', ({ references }) => {
       references.push({
         path: join(nuxt.options.buildDir, 'component-meta.d.ts')
       })

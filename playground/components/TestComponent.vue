@@ -38,7 +38,8 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['change', 'delete'])
+defineEmits(['change', 'delete'])
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const test = {}
 </script>
