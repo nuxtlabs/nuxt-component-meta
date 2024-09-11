@@ -269,7 +269,7 @@ function stripeTypeScriptInternalTypesSchema (type: any): any {
     return type
   }
 
-  if (type.declarations && type.declarations.find((d: any) => d.file.includes('node_modules/typescript'))) {
+  if (type.declarations && type.declarations.find((d: any) => d.file.includes('node_modules/typescript') || d.file.includes('@vue/runtime-core'))) {
     return false
   }
 
