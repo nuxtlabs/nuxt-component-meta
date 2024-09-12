@@ -185,8 +185,8 @@ export function useComponentMetaParser (
       component.meta.events = metaFields.events ? events : []
       component.meta.exposed = metaFields.exposed ? exposed : []
       component.meta.props = (metaFields.props ? props : [])
-        .filter(prop => !prop.global)
-        .sort((a, b) => {
+        .filter((prop: any) => !prop.global)
+        .sort((a: { type: string, required: boolean }, b: { type: string, required: boolean }) => {
           // sort required properties first
           if (!a.required && b.required) {
             return 1
@@ -205,10 +205,10 @@ export function useComponentMetaParser (
           return 0
         })
 
-      component.meta.props = component.meta.props.map(stripeTypeScriptInternalTypesSchema)
-      component.meta.slots = component.meta.slots.map(stripeTypeScriptInternalTypesSchema)
-      component.meta.exposed = component.meta.exposed.map(stripeTypeScriptInternalTypesSchema)
-      component.meta.events = component.meta.events.map(stripeTypeScriptInternalTypesSchema)
+      component.meta.props = component.meta.props.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
+      component.meta.slots = component.meta.slots.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
+      component.meta.exposed = component.meta.exposed.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
+      component.meta.events = component.meta.events.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
 
       // Remove descriptional fileds to reduce chunk size
       removeFields(component.meta, ['declarations'])
@@ -264,24 +264,24 @@ function removeFields(obj: Record<string, any>, fieldsToRemove: string[]): any {
   return obj;
 }
 
-function stripeTypeScriptInternalTypesSchema (type: any): any {
+function stripeTypeScriptInternalTypesSchema (type: any, topLevel: boolean = true): any {
   if (!type) {
     return type
   }
 
-  if (type.declarations && type.declarations.find((d: any) => d.file.includes('node_modules/typescript') || d.file.includes('@vue/runtime-core'))) {
+  if (!topLevel && type.declarations && type.declarations.find((d: any) => d.file.includes('node_modules/typescript') || d.file.includes('@vue/runtime-core'))) {
     return false
   }
 
   if (Array.isArray(type)) {
-    return type.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch)).filter(r => r !== false)
+    return type.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, false)).filter(r => r !== false)
   }
 
   if (Array.isArray(type.schema)) {
     return {
       ...type,
       declarations: undefined,
-      schema: type.schema.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch)).filter((r: any) => r !== false)
+      schema: type.schema.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, false)).filter((r: any) => r !== false)
     }
   }
 
@@ -294,14 +294,14 @@ function stripeTypeScriptInternalTypesSchema (type: any): any {
     if (sch === 'schema' && type.schema[sch]) {
       schema[sch] = schema[sch] || {}
       Object.keys(type.schema[sch]).forEach((sch2) => {
-        const res = stripeTypeScriptInternalTypesSchema(type.schema[sch][sch2])
+        const res = stripeTypeScriptInternalTypesSchema(type.schema[sch][sch2], false)
         if (res !== false) {
           schema[sch][sch2] = res
         }
       })
       return
     }
-    const res = stripeTypeScriptInternalTypesSchema(type.schema[sch])
+    const res = stripeTypeScriptInternalTypesSchema(type.schema[sch], false)
 
     if (res !== false) {
       schema[sch] = res
