@@ -7,6 +7,12 @@
 </template>
 
 <script setup>
+
+extendComponentMeta({
+  hello: 'world',
+  foo: 'bar'
+})
+
 defineProps({
   hello: {
     type: String,

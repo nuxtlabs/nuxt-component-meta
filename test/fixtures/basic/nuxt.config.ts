@@ -1,4 +1,4 @@
-import nuxtMetaModule from 'nuxt-component-meta'
+import nuxtMetaModule from '../../../src/module'
 
 export default defineNuxtConfig({
   components: {
