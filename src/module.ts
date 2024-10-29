@@ -17,6 +17,8 @@ import type { NuxtComponentMeta } from './types'
 
 export * from './options'
 
+const slotReplacer = (_: unknown, _before: string, slotName: string, _rest: unknown) => `<slot ${_before || ''}${slotName === 'default' ? '' : `name="${slotName}"`}`
+
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: 'nuxt-component-meta',
@@ -40,19 +42,18 @@ export default defineNuxtModule<ModuleOptions>({
     transformers: [
       // @nuxt/content support
       (component, code) => {
-        code = code.replace(
-          /<ContentSlot\s*([^>]*)?:use="\$slots\.([a-zA-Z0-9_]+)"/gm,
-          (_, _before, slotName, _rest) => {
-            return `<slot ${_before || ''}${slotName === 'default' ? '' : `name="${slotName}"`}`
-          }
-        )
-        code = code.replace(
-          /<ContentSlot\s*([^>]*)?name="([a-zA-Z0-9_]+)"/gm,
-          (_, _before, slotName, _rest) => {
-            return `<slot ${_before || ''}${slotName === 'default' ? '' : `name="${slotName}"`}`
-          }
-        )
-        code = code.replace(/<\/ContentSlot>/gm, '</slot>')
+        // MDCSlot
+        if (code.includes('MDCSlot')) {
+          code = code.replace(/<MDCSlot\s*([^>]*)?:use="\$slots\.([a-zA-Z0-9_]+)"/gm, slotReplacer)
+          code = code.replace(/<MDCSlot\s*([^>]*)?name="([a-zA-Z0-9_]+)"/gm, slotReplacer)
+          code = code.replace(/<\/MDCSlot>/gm, '</slot>')
+        }
+        // ContentSlot
+        if (code.includes('ContentSlot')) {
+          code = code.replace(/<ContentSlot\s*([^>]*)?:use="\$slots\.([a-zA-Z0-9_]+)"/gm, slotReplacer)
+          code = code.replace(/<ContentSlot\s*([^>]*)?name="([a-zA-Z0-9_]+)"/gm, slotReplacer)
+          code = code.replace(/<\/ContentSlot>/gm, '</slot>')
+        }
 
         // Handle `(const|let|var) slots = useSlots()`
         const name = code.match(/(const|let|var) ([a-zA-Z][a-zA-Z-_0-9]*) = useSlots\(\)/)?.[2] || '$slots'
@@ -97,8 +98,8 @@ export default defineNuxtModule<ModuleOptions>({
 
 
     // Retrieve transformers
-    const transformers = options?.transformers || []
-    await nuxt.callHook('component-meta:transformers' as any, transformers)
+    let transformers = options?.transformers || []
+    transformers = await nuxt.callHook('component-meta:transformers' as any, transformers) || transformers
 
     let parser: ComponentMetaParser
     const parserOptions: ComponentMetaParserOptions = {
