@@ -76,4 +76,9 @@ describe('fixtures:basic', async () => {
     expect(component.meta.slots[0].name).toBe('title')
     expect(component.meta.slots[1].name).toBe('default')
   })
+
+  test('Test extendComponentMeta', async () => {
+    const component = await $fetch('/api/component-meta/TestComponent')
+    expect(component.meta).toMatchObject({ hello: 'world', foo: 'bar' })
+  })
 })

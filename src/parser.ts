@@ -8,6 +8,7 @@ import type { Component } from '@nuxt/schema'
 import { resolvePathSync } from 'mlly'
 import type { ModuleOptions } from './options'
 import type { NuxtComponentMeta } from './types'
+import { defu } from 'defu'
 
 export type ComponentMetaParserOptions = Omit<ModuleOptions, 'components' | 'metaSources'> & {
   components: Component[]
@@ -210,6 +211,12 @@ export function useComponentMetaParser (
       component.meta.exposed = component.meta.exposed.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
       component.meta.events = component.meta.events.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
 
+
+      const content = await readFile(component.fullPath, 'utf-8')
+      const extendComponentMetaMatch = content.match(/extendComponentMeta\((\{[\s\S]*?\})\)/);
+      const extendedComponentMeta =  extendComponentMetaMatch?.length ? eval(`(${extendComponentMetaMatch[1]})`) : null
+      component.meta = defu(component.meta, extendedComponentMeta)
+
       // Remove descriptional fileds to reduce chunk size
       removeFields(component.meta, ['declarations'])
 
@@ -260,7 +267,6 @@ function removeFields(obj: Record<string, any>, fieldsToRemove: string[]): any {
       }
     }
   }
-  
   return obj;
 }
 
