@@ -97,8 +97,8 @@ export default defineNuxtModule<ModuleOptions>({
 
 
     // Retrieve transformers
-    let transformers = options?.transformers || []
-    transformers = await nuxt.callHook('component-meta:transformers' as any, transformers)
+    const transformers = options?.transformers || []
+    await nuxt.callHook('component-meta:transformers' as any, transformers)
 
     let parser: ComponentMetaParser
     const parserOptions: ComponentMetaParserOptions = {
