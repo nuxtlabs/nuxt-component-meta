@@ -43,6 +43,7 @@ export default defineNuxtModule<ModuleOptions>({
       'nuxt/dist/app/components/nuxt-route-announcer',
       'nuxt/dist/app/components/nuxt-stubs',
     ],
+    include: [],
     metaFields: {
       type: true,
       props: true,
@@ -107,6 +108,24 @@ export default defineNuxtModule<ModuleOptions>({
   async setup (options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
+    const isComponentIncluded = (component: any) => {
+      if (!options?.globalsOnly) { return true }
+      
+      if (component.global) { return true }
+
+      return (options.include || []).find((excludeRule) => {
+        switch (typeof excludeRule) {
+          case 'string':
+            return component.pascalName === excludeRule || component.filePath.includes(excludeRule)
+          case 'object':
+            return excludeRule instanceof RegExp ? excludeRule.test(component.filePath) : false
+          case 'function':
+            return excludeRule(component)
+          default:
+            return false
+        }
+      })
+    }
 
     // Retrieve transformers
     let transformers = options?.transformers || []
@@ -148,10 +167,7 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     nuxt.hook('components:extend', async (_components) => {
-      components = _components
-
-      // Support `globalsOnly` option
-      if (options?.globalsOnly) { components = components.filter(c => c.global) }
+      components = _components.filter(isComponentIncluded)
 
       // Load external components definitions
       metaSources = await loadExternalSources(options.metaSources)

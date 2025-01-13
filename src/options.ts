@@ -34,6 +34,10 @@ export interface ModuleOptions {
    */
   exclude?: (string | RegExp | ((component: any) => boolean))[]
   /**
+   * Component paths and/or path regexps to be included.
+   */
+  include?: (string | RegExp | ((component: any) => boolean))[]
+  /**
    * vue-component-meta checker options.
    */
   checkerOptions?: MetaCheckerOptions
