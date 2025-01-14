@@ -16,6 +16,7 @@ import { loadExternalSources } from './loader'
 import type { NuxtComponentMeta } from './types'
 
 export * from './options'
+export type * from './types.d'
 
 const slotReplacer = (_: unknown, _before: string, slotName: string, _rest: unknown) => `<slot ${_before || ''}${slotName === 'default' ? '' : `name="${slotName}"`}`
 
