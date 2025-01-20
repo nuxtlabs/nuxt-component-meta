@@ -4,6 +4,7 @@ import { join, relative, resolve } from 'pathe'
 import pkg from '../../package.json' assert { type: 'json' }
 import { loadKit } from './utils/kit'
 import { clearBuildDir } from './utils/fs'
+import { importModule } from './utils/esm';
 
 const privateKeys = new Set([
   'fullPath',
@@ -97,7 +98,7 @@ export const generate = defineCommand({
     await clearBuildDir(outputDir)
     await buildNuxt(nuxt)
 
-    const components = await import(inputSource).then((m: any) => m.default || m)
+    const components = await importModule(inputSource).then((m: any) => m.default || m)
 
     await Promise.all([
       copyFile(inputTypes, outputTypes),
