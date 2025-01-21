@@ -4,7 +4,7 @@ import { join, relative, resolve } from 'pathe'
 import pkg from '../../package.json' assert { type: 'json' }
 import { loadKit } from './utils/kit'
 import { clearBuildDir } from './utils/fs'
-import { importModule } from './utils/esm';
+import { importModule } from './utils/esm'
 
 const privateKeys = new Set([
   'fullPath',
