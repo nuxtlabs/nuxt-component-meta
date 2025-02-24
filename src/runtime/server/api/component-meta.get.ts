@@ -7,7 +7,7 @@ export default defineEventHandler((event) => {
   // TODO: Replace via downstream config
   appendHeader(event, 'Access-Control-Allow-Origin', '*')
 
-  const componentName = (event.context.params['component?'] || '').replace(/\.json$/, '')
+  const componentName = (event.context.params?.['component?'] || '').replace(/\.json$/, '')
 
   if (componentName) {
     const meta = components[pascalCase(componentName)]

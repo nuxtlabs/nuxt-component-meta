@@ -239,12 +239,12 @@ export default defineNuxtModule<ModuleOptions>({
     addServerHandler({
       method: 'get',
       route: '/api/component-meta.json',
-      handler: resolver.resolve('./runtime/server/api/component-meta.get')
+      handler: resolver.resolve('./runtime/server/api/component-meta.json.get')
     })
     addServerHandler({
       method: 'get',
       route: '/api/component-meta/:component?',
-      handler: resolver.resolve('./runtime/server/api/component-meta.get')
+      handler: resolver.resolve('./runtime/server/api/component-meta-component.get')
     })
   }
 })
