@@ -8,12 +8,7 @@ export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(({ parser
     const instance = parser || useComponentMetaParser(parserOptions)
     let _configResolved: any
 
-    return [
-      {
-        name: 'vite-plugin-nuxt-component-meta',
-        enforce: 'before',
-      },
-      {
+    return {
       name: 'vite-plugin-nuxt-component-meta',
       enforce: 'post',
       buildStart () {
@@ -36,5 +31,5 @@ export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(({ parser
           }
         }
       }
-    }]
+    }
   })
