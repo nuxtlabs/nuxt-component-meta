@@ -176,6 +176,11 @@ export function useComponentMetaParser (
       // Component is missing required values
       if (!component?.fullPath || !component?.pascalName) { return }
 
+      if (component.meta.hash && component.fullPath.includes('/node_modules/')) {
+        // We assume that components from node_modules don't change
+        return 
+      }
+
       // Read component code
       let code = fs.readFileSync(component.fullPath, 'utf-8')
       const codeHash = hash(code)
