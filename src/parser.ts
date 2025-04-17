@@ -149,15 +149,6 @@ export function useComponentMetaParser (
    * Fetch a component metas by its file name.
    */
   const fetchComponent = (component: string | any) => {
-    // Create the checker at the very last moment and silently fail if unavailable.
-    if (!checker) {
-      try {
-        refreshChecker()
-      } catch {
-        return
-      }
-    }
-
     const startTime = performance.now()
     try {
       if (typeof component === 'string') {
@@ -186,6 +177,15 @@ export function useComponentMetaParser (
       const codeHash = hash(code)
       if (codeHash === component.meta.hash) {
         return
+      }
+
+      // Create the checker at the very last moment and silently fail if unavailable.
+      if (!checker) {
+        try {
+          refreshChecker()
+        } catch {
+          return
+        }
       }
 
       // Support transformers
