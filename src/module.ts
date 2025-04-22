@@ -182,17 +182,20 @@ export default defineNuxtModule<ModuleOptions>({
       parser = useComponentMetaParser(parserOptions)
 
       // Stub output in case it does not exist yet
-      await parser.stubOutput()
+      await Promise.all([
+        parser.init(),
+        parser.stubOutput(),
+      ])
     })
 
     // Add useComponentMeta
     addImportsDir(resolver.resolve('./runtime/composables'))
 
-    addTemplate({
-      filename: 'component-meta.mjs',
-      getContents: () => 'export default {}',
-      write: true
-    })
+    // addTemplate({
+    //   filename: 'component-meta.mjs',
+    //   getContents: () => 'export default {}',
+    //   write: true
+    // })
 
     addTemplate({
       filename: 'component-meta.d.ts',

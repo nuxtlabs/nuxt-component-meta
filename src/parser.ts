@@ -1,11 +1,11 @@
-import { writeFile, readFile, unlink, mkdir } from 'fs/promises'
 import { performance } from 'perf_hooks'
-import { existsSync } from 'fs'
+import fs, { existsSync } from 'fs'
 import { dirname, join, relative } from 'pathe'
 import { logger } from '@nuxt/kit'
 import { createCheckerByJson } from 'vue-component-meta'
 import type { Component } from '@nuxt/schema'
 import { resolvePathSync } from 'mlly'
+import { hash } from 'ohash'
 import type { ModuleOptions } from './options'
 import type { NuxtComponentMeta } from './types'
 import { defu } from 'defu'
@@ -48,31 +48,6 @@ export function useComponentMetaParser (
     })
   }
 
-  /**
-   * Initialize component data object from components
-   */
-  const components: NuxtComponentMeta = { ...metaSources }
-  for (const component of _components || []) {
-    // Locally support exclude as it seem broken from createCheckerByJson
-    if (isExcluded(component)) { continue }
-    if (!component.filePath || !component.pascalName) { continue }
-
-    const filePath = resolvePathSync(component.filePath)
-
-    components[component.pascalName] = {
-      ...component,
-      fullPath: filePath,
-      filePath: relative(rootDir, filePath),
-      meta: {
-        type: 0,
-        props: [],
-        slots: [],
-        events: [],
-        exposed: []
-      }
-    }
-  }
-
   const getStringifiedComponents = () => {
     const _components = Object.keys(components).map((key) => ([
       key,
@@ -112,13 +87,52 @@ export function useComponentMetaParser (
   }
 
   /**
+   * Initialize component data object from components
+   */
+  const components: NuxtComponentMeta = { ...metaSources }
+  const init = async () => {
+    const meta = await import(outputPath + '.mjs').then((m) => m.default || m).catch(() => null)
+
+    for (const component of _components || []) {
+      // Locally support exclude as it seem broken from createCheckerByJson
+      if (isExcluded(component)) { continue }
+      if (!component.filePath || !component.pascalName) { continue }
+
+      const filePath = resolvePathSync(component.filePath)
+
+      components[component.pascalName] = {
+        ...component,
+        fullPath: filePath,
+        filePath: relative(rootDir, filePath),
+        meta: {
+          type: 0,
+          props: [],
+          slots: [],
+          events: [],
+          exposed: []
+        }
+      }
+    }
+
+    if (meta) {
+      Object.keys(meta).forEach((key) => {
+        if (components[key]) {
+          components[key].meta = meta[key].meta
+        } else {
+          components[key] = meta[key]
+        }
+      })
+    }
+  }
+
+  /**
    * Write the output file.
    */
-  const updateOutput = async (content?: string) => {
+  const updateOutput = (content?: string) => {
     const path = outputPath + '.mjs'
-    if (!existsSync(dirname(path))) { await mkdir(dirname(path), { recursive: true }) }
-    if (existsSync(path)) { await unlink(path) }
-    await writeFile(
+    if (!existsSync(dirname(path))) { fs.mkdirSync(dirname(path), { recursive: true }) }
+    if (existsSync(path)) { fs.unlinkSync(path) }
+    fs.writeFileSync(
       path,
       content || getVirtualModuleContent(),
       'utf-8'
@@ -136,16 +150,7 @@ export function useComponentMetaParser (
   /**
    * Fetch a component metas by its file name.
    */
-  const fetchComponent = async (component: string | any) => {
-    // Create the checker at the very last moment and silently fail if unavailable.
-    if (!checker) {
-      try {
-        refreshChecker()
-      } catch (e) {
-        return
-      }
-    }
-
+  const fetchComponent = (component: string | any) => {
     const startTime = performance.now()
     try {
       if (typeof component === 'string') {
@@ -164,23 +169,44 @@ export function useComponentMetaParser (
       // Component is missing required values
       if (!component?.fullPath || !component?.pascalName) { return }
 
+      if (component.meta.hash && component.fullPath.includes('/node_modules/')) {
+        // We assume that components from node_modules don't change
+        return 
+      }
+
+      // Read component code
+      let code = fs.readFileSync(component.fullPath, 'utf-8')
+      const codeHash = hash(code)
+      if (codeHash === component.meta.hash) {
+        return
+      }
+
+      // Create the checker at the very last moment and silently fail if unavailable.
+      if (!checker) {
+        try {
+          refreshChecker()
+        } catch {
+          return
+        }
+      }
+
       // Support transformers
       if (transformers && transformers.length > 0) {
-        // Read component code
-        let code = await readFile(component.fullPath, 'utf-8')
-
         for (const transform of transformers) {
           const transformResult = transform(component, code)
           component = transformResult?.component || component
           code = transformResult?.code || code
         }
 
+
         // Ensure file is updated
         checker.updateFile(component.fullPath, code)
       }
 
+
       const { type, props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
 
+      component.meta.hash = codeHash
       component.meta.type = metaFields.type ? type : 0
       component.meta.slots = metaFields.slots ? slots : []
       component.meta.events = metaFields.events ? events : []
@@ -211,9 +237,7 @@ export function useComponentMetaParser (
       component.meta.exposed = component.meta.exposed.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
       component.meta.events = component.meta.events.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
 
-
-      const content = await readFile(component.fullPath, 'utf-8')
-      const extendComponentMetaMatch = content.match(/extendComponentMeta\((\{[\s\S]*?\})\)/);
+      const extendComponentMetaMatch = code.match(/extendComponentMeta\((\{[\s\S]*?\})\)/);
       const extendedComponentMeta =  extendComponentMetaMatch?.length ? eval(`(${extendComponentMetaMatch[1]})`) : null
       component.meta = defu(component.meta, extendedComponentMeta)
 
@@ -221,8 +245,10 @@ export function useComponentMetaParser (
       removeFields(component.meta, ['declarations'])
 
       components[component.pascalName] = component
-    } catch (e) {
-      debug && logger.info(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
+    } catch {
+      if (debug) {
+        logger.info(`Could not parse ${component?.pascalName || component?.filePath || 'a component'}!`)
+      }
     }
     const endTime = performance.now()
     if (debug === 2) { logger.success(`${component?.pascalName || component?.filePath || 'a component'} metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
@@ -231,9 +257,11 @@ export function useComponentMetaParser (
   /**
    * Fetch all components metas
    */
-  const fetchComponents = async () => {
+  const fetchComponents = () => {
     const startTime = performance.now()
-    await Promise.all(Object.values(components).map(fetchComponent))
+    for (const component of Object.values(components)) {
+      fetchComponent(component)
+    }
     const endTime = performance.now()
     if (!debug || debug === 2) { logger.success(`Components metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
   }
@@ -241,6 +269,7 @@ export function useComponentMetaParser (
   return {
     get checker () { return checker },
     get components () { return components },
+    init,
     refreshChecker,
     stubOutput,
     outputPath,
