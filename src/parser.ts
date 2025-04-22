@@ -114,13 +114,15 @@ export function useComponentMetaParser (
       }
     }
 
-    Object.keys(meta).forEach((key) => {
-      if (components[key]) {
-        components[key].meta = meta[key].meta
-      } else {
-        components[key] = meta[key]
-      }
-    })
+    if (meta) {
+      Object.keys(meta).forEach((key) => {
+        if (components[key]) {
+          components[key].meta = meta[key].meta
+        } else {
+          components[key] = meta[key]
+        }
+      })
+    }
   }
 
   /**
