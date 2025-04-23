@@ -33,7 +33,7 @@ export default defineComponent({
 
       try {
         src = JSON.parse(src as any)
-      } catch (e) {
+      } catch {
         src = props.src
       }
 
@@ -46,7 +46,7 @@ export default defineComponent({
       imgSrc
     }
   },
-  render ({ imgSrc }) {
+  render ({ imgSrc }: { imgSrc: any }) {
     // String as `src`; return a single image
     if (typeof imgSrc === 'string') {
       return h('img', { src: imgSrc })
