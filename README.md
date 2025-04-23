@@ -62,3 +62,9 @@ npm i nuxt-component-meta@nightly
 1. Clone this repository
 2. Install dependencies using `pnpm install`
 3. Start dev server using `pnpm dev`
+
+## License
+
+[MIT License](https://github.com/nuxtlabs/nuxt-component-meta/blob/main/LICENSE)
+
+Copyright (c) NuxtLabs
