@@ -1,10 +1,11 @@
 import { createUnplugin } from 'unplugin'
 import { type ComponentMetaParser, useComponentMetaParser, type ComponentMetaParserOptions } from './parser'
+import type { Nuxt } from 'nuxt/schema'
 
-type ComponentMetaUnpluginOptions = { parser?: ComponentMetaParser, parserOptions: ComponentMetaParserOptions }
+type ComponentMetaUnpluginOptions = { nuxt: Nuxt, parser?: ComponentMetaParser, parserOptions: ComponentMetaParserOptions }
 
 // @ts-ignore -- arguments types are not correct
-export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(({ parser, parserOptions }) => {
+export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(({ nuxt, parser, parserOptions }) => {
     const instance = parser || useComponentMetaParser(parserOptions)
     let _configResolved: any
 
@@ -18,6 +19,7 @@ export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(({ parser
         }
 
         instance.fetchComponents()
+        nuxt.callHook('component-meta:parsed', instance.components)
         instance.updateOutput()
       },
       vite: {
@@ -26,7 +28,7 @@ export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(({ parser
         },
         handleHotUpdate ({ file }) {
           if (Object.entries(instance.components).some(([, comp]: any) => comp.fullPath === file)) {
-            instance.fetchComponent(file)
+            nuxt.callHook('component-meta:hot-reloaded', instance.fetchComponent(file))
             instance.updateOutput()
           }
         }

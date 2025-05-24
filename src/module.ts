@@ -104,7 +104,8 @@ export default defineNuxtModule<ModuleOptions>({
         ]
       }
     },
-    globalsOnly: false
+    globalsOnly: false,
+    onlyParseMetas: false
   }),
   async setup (options, nuxt) {
     const resolver = createResolver(import.meta.url)
@@ -188,8 +189,10 @@ export default defineNuxtModule<ModuleOptions>({
       ])
     })
 
-    // Add useComponentMeta
-    addImportsDir(resolver.resolve('./runtime/composables'))
+    if (!options.onlyParseMetas) {
+      // Add useComponentMeta
+      addImportsDir(resolver.resolve('./runtime/composables'))
+    }
 
     // addTemplate({
     //   filename: 'component-meta.mjs',
@@ -214,7 +217,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Vite plugin
     nuxt.hook('vite:extend', (vite: any) => {
       vite.config.plugins = vite.config.plugins || []
-      vite.config.plugins.push(metaPlugin.vite({ parser, parserOptions }))
+      vite.config.plugins.push(metaPlugin.vite({ nuxt, parser, parserOptions }))
     })
 
     // Inject output alias
@@ -234,20 +237,23 @@ export default defineNuxtModule<ModuleOptions>({
       nitroConfig.virtual = nitroConfig.virtual || {}
       nitroConfig.virtual['#nuxt-component-meta/nitro'] = () => readFileSync(join(nuxt.options.buildDir, '/component-meta.mjs'), 'utf-8')
     })
-    addServerHandler({
-      method: 'get',
-      route: '/api/component-meta',
-      handler: resolver.resolve('./runtime/server/api/component-meta.get')
-    })
-    addServerHandler({
-      method: 'get',
-      route: '/api/component-meta.json',
-      handler: resolver.resolve('./runtime/server/api/component-meta.json.get')
-    })
-    addServerHandler({
-      method: 'get',
-      route: '/api/component-meta/:component?',
-      handler: resolver.resolve('./runtime/server/api/component-meta-component.get')
-    })
+
+    if (!options.onlyParseMetas) {
+      addServerHandler({
+        method: 'get',
+        route: '/api/component-meta',
+        handler: resolver.resolve('./runtime/server/api/component-meta.get')
+      })
+      addServerHandler({
+        method: 'get',
+        route: '/api/component-meta.json',
+        handler: resolver.resolve('./runtime/server/api/component-meta.json.get')
+      })
+      addServerHandler({
+        method: 'get',
+        route: '/api/component-meta/:component?',
+        handler: resolver.resolve('./runtime/server/api/component-meta-component.get')
+      })
+    }
   }
 })

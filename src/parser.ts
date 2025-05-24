@@ -252,6 +252,8 @@ export function useComponentMetaParser (
     }
     const endTime = performance.now()
     if (debug === 2) { logger.success(`${component?.pascalName || component?.filePath || 'a component'} metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
+
+    return components[component.pascalName]
   }
 
   /**
@@ -264,6 +266,8 @@ export function useComponentMetaParser (
     }
     const endTime = performance.now()
     if (!debug || debug === 2) { logger.success(`Components metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
+    
+    return components
   }
 
   return {
