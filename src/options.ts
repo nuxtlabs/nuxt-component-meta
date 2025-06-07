@@ -1,6 +1,6 @@
 import type { MetaCheckerOptions } from 'vue-component-meta'
 import type { ComponentsDir, ComponentsOptions } from '@nuxt/schema'
-import type { TransformersHookData, ExtendHookData, NuxtComponentMeta } from './types'
+import type { TransformersHookData, ExtendHookData, NuxtComponentMeta, ComponentData } from './types'
 
 export interface ModuleOptions {
   /**
@@ -67,9 +67,21 @@ export interface ModuleOptions {
    * It can be a path to a file exporting a default object of components definitions or an object of components definitions.
    */
   metaSources?: (string | Partial<NuxtComponentMeta>)[]
+  /**
+   * Disable anything that is not related to the component meta parsing.
+   */
+  onlyParseMetas?: boolean
+  /**
+   * Whether to parse component meta at build time.
+   *
+   * If false, it will only parse at runtime.
+   */
+  parseAtBuild?: boolean
 }
 
 export interface ModuleHooks {
   'component-meta:transformers'(data: TransformersHookData): void
   'component-meta:extend'(data: ExtendHookData): void
+  'component-meta:parsed'(data: NuxtComponentMeta): void
+  'component-meta:hot-reloaded'(data: ComponentData | undefined): void
 }
