@@ -70,16 +70,11 @@ export function useComponentMetaParser (
       {
         extends: `${rootDir}/tsconfig.json`,
         skipLibCheck: true,
-        include: [
-          '**/*',
-          ...componentDirs.map((dir) => {
-            const path = typeof dir === 'string' ? dir : (dir?.path || '')
-            if (path.endsWith('.vue')) {
-              return path
-            }
-            return `${path}/**/*`
-          })
-        ],
+        include: componentDirs.map((dir) => {
+          const path = typeof dir === 'string' ? dir : (dir?.path || '')
+          const ext = path.split('.').pop()!
+          return ['vue', 'ts', 'tsx', 'js', 'jsx'].includes(ext) ? path : `${path}/**/*`
+        }),
         exclude: []
       },
       checkerOptions
@@ -171,7 +166,7 @@ export function useComponentMetaParser (
 
       if (component.meta.hash && component.fullPath.includes('/node_modules/')) {
         // We assume that components from node_modules don't change
-        return 
+        return
       }
 
       // Read component code
