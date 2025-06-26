@@ -5,7 +5,7 @@ type ComponentMetaUnpluginOptions = { parser?: ComponentMetaParser, parserOption
 
 // @ts-ignore -- arguments types are not correct
 export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(({ parser, parserOptions }) => {
-    const instance = parser || useComponentMetaParser(parserOptions)
+    let instance = parser || useComponentMetaParser(parserOptions)
     let _configResolved: any
 
     return {
@@ -17,15 +17,22 @@ export const metaPlugin = createUnplugin<ComponentMetaUnpluginOptions>(({ parser
           return
         }
 
-        instance.fetchComponents()
-        instance.updateOutput()
+        instance?.fetchComponents()
+        instance?.updateOutput()
+      },
+      buildEnd () {
+        if (!_configResolved?.env.DEV && _configResolved?.env.PROD) {
+          instance?.dispose()
+          // @ts-expect-error -- Remove instance from memory
+          instance = null
+        }
       },
       vite: {
         configResolved (config) {
           _configResolved = config
         },
         handleHotUpdate ({ file }) {
-          if (Object.entries(instance.components).some(([, comp]: any) => comp.fullPath === file)) {
+          if (instance && Object.entries(instance.components).some(([, comp]: any) => comp.fullPath === file)) {
             instance.fetchComponent(file)
             instance.updateOutput()
           }
