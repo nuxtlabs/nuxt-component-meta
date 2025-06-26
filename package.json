@@ -32,7 +32,7 @@
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:generate": "nuxi generate playground",
-    "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground",
+    "dev:prepare": "nuxt-module-build build --stub && nuxi prepare playground",
     "lint": "eslint ",
     "test": "vitest run",
     "verify": "pnpm dev:prepare && pnpm lint && pnpm test",

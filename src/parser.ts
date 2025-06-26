@@ -31,6 +31,10 @@ export function useComponentMetaParser (
 ) {
   // const logger = consola.withScope('nuxt-component-meta')
 
+  /**
+   * Initialize component data object from components
+   */
+  let components: NuxtComponentMeta = { ...metaSources }
   const outputPath = join(outputDir, 'component-meta')
 
   const isExcluded = (component: any) => {
@@ -81,10 +85,6 @@ export function useComponentMetaParser (
     )
   }
 
-  /**
-   * Initialize component data object from components
-   */
-  const components: NuxtComponentMeta = { ...metaSources }
   const init = async () => {
     const meta = await import(outputPath + '.mjs').then((m) => m.default || m).catch(() => null)
 
@@ -264,6 +264,13 @@ export function useComponentMetaParser (
   return {
     get checker () { return checker },
     get components () { return components },
+    dispose() {
+      checker.clearCache()
+      // @ts-expect-error - Remove checker
+      checker = null
+      // Clear components cache
+      components = {}
+    },
     init,
     refreshChecker,
     stubOutput,
