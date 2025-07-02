@@ -9,6 +9,7 @@ import { hash } from 'ohash'
 import type { ModuleOptions } from './options'
 import type { NuxtComponentMeta } from './types'
 import { defu } from 'defu'
+import { camelCase } from 'scule'
 
 export type ComponentMetaParserOptions = Omit<ModuleOptions, 'components' | 'metaSources'> & {
   components: Component[]
@@ -206,8 +207,10 @@ export function useComponentMetaParser (
       component.meta.slots = metaFields.slots ? slots : []
       component.meta.events = metaFields.events ? events : []
       component.meta.exposed = metaFields.exposed ? exposed : []
+
+      const eventProps = new Set<string>(events.map(event => camelCase(`on_${event.name}`)))
       component.meta.props = (metaFields.props ? props : [])
-        .filter((prop: any) => !prop.global)
+        .filter((prop: any) => !prop.global && !eventProps.has(prop.name as string))
         .sort((a: { type: string, required: boolean }, b: { type: string, required: boolean }) => {
           // sort required properties first
           if (!a.required && b.required) {
