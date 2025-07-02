@@ -2,8 +2,8 @@
   "private": true,
   "name": "nuxt-component-meta-playground",
   "devDependencies": {
-    "@nuxt/content": "^2.3.0",
-    "nuxt": "^3.0.0",
+    "@nuxt/content": "^3.6.1",
+    "nuxt": "^3.17.6",
     "nuxt-component-meta": "link:.."
   },
   "scripts": {

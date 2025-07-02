@@ -11,7 +11,8 @@ import { join } from 'pathe'
 import type { ComponentsDir, Component } from '@nuxt/schema'
 import { metaPlugin } from './unplugin'
 import type { ModuleOptions } from './options'
-import { type ComponentMetaParser, useComponentMetaParser, type ComponentMetaParserOptions } from './parser'
+import {  useComponentMetaParser  } from './parser'
+import type {ComponentMetaParser, ComponentMetaParserOptions} from './parser';
 import { loadExternalSources } from './loader'
 import type { NuxtComponentMeta } from './types'
 
