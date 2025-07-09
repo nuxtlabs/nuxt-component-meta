@@ -9,15 +9,14 @@ import {
 } from '@nuxt/kit'
 import { join } from 'pathe'
 import type { ComponentsDir, Component } from '@nuxt/schema'
-import { metaPlugin } from './unplugin'
-import type { ModuleOptions } from './options'
-import {  useComponentMetaParser  } from './parser'
-import type {ComponentMetaParser, ComponentMetaParserOptions} from './parser';
-import { loadExternalSources } from './loader'
-import type { NuxtComponentMeta } from './types'
+import { metaPlugin } from './utils/unplugin'
+import { useComponentMetaParser } from './parser/meta-parser'
+import type { ComponentMetaParser } from './parser/meta-parser';
+import { loadExternalSources } from './utils/loader'
+import type { NuxtComponentMeta, ComponentMetaParserOptions, ModuleOptions } from './types/index'
 
-export * from './options'
-export type * from './types.d'
+export * from './types/module'
+export type * from './types/index'
 
 const slotReplacer = (_: unknown, _before: string, slotName: string, _rest: unknown) => `<slot ${_before || ''}${slotName === 'default' ? '' : `name="${slotName}"`}`
 
@@ -112,7 +111,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     const isComponentIncluded = (component: any) => {
       if (!options?.globalsOnly) { return true }
-      
       if (component.global) { return true }
 
       return (options.include || []).find((excludeRule) => {
@@ -146,7 +144,7 @@ export default defineNuxtModule<ModuleOptions>({
     let components: Component[] = []
     let metaSources: NuxtComponentMeta = {}
 
-    const uiTemplatesPath = await tryResolveModule('@nuxt/ui-templates')
+    const uiTemplatesPath = await tryResolveModule('@nuxt/ui-templates', import.meta.url)
     nuxt.hook('components:dirs', (dirs) => {
       componentDirs = [
         ...componentDirs,

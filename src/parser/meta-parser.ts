@@ -3,18 +3,12 @@ import fs, { existsSync } from 'fs'
 import { dirname, join, relative } from 'pathe'
 import { logger } from '@nuxt/kit'
 import { createCheckerByJson } from 'vue-component-meta'
-import type { Component } from '@nuxt/schema'
 import { resolvePathSync } from 'mlly'
 import { hash } from 'ohash'
-import type { ModuleOptions } from './options'
-import type { NuxtComponentMeta } from './types'
+import type { ComponentMetaParserOptions, NuxtComponentMeta } from '../types/parser'
 import { defu } from 'defu'
-import { camelCase } from 'scule'
+import { refineMeta } from './utils'
 
-export type ComponentMetaParserOptions = Omit<ModuleOptions, 'components' | 'metaSources'> & {
-  components: Component[]
-  metaSources?: NuxtComponentMeta
-}
 
 export function useComponentMetaParser (
   {
@@ -30,8 +24,6 @@ export function useComponentMetaParser (
     metaSources = {}
   }: ComponentMetaParserOptions
 ) {
-  // const logger = consola.withScope('nuxt-component-meta')
-
   /**
    * Initialize component data object from components
    */
@@ -138,9 +130,9 @@ export function useComponentMetaParser (
   /**
    * Stub output file
    */
-  const stubOutput = async () => {
+  const stubOutput = () => {
     if (existsSync(outputPath + '.mjs')) { return }
-    await updateOutput('export default {}')
+    updateOutput('export default {}')
   }
 
   /**
@@ -199,48 +191,19 @@ export function useComponentMetaParser (
         checker.updateFile(component.fullPath, code)
       }
 
+      const meta = checker.getComponentMeta(component.fullPath)
 
-      const { type, props, slots, events, exposed } = checker.getComponentMeta(component.fullPath)
-
-      component.meta.hash = codeHash
-      component.meta.type = metaFields.type ? type : 0
-      component.meta.slots = metaFields.slots ? slots : []
-      component.meta.events = metaFields.events ? events : []
-      component.meta.exposed = metaFields.exposed ? exposed : []
-
-      const eventProps = new Set<string>(events.map(event => camelCase(`on_${event.name}`)))
-      component.meta.props = (metaFields.props ? props : [])
-        .filter((prop: any) => !prop.global && !eventProps.has(prop.name as string))
-        .sort((a: { type: string, required: boolean }, b: { type: string, required: boolean }) => {
-          // sort required properties first
-          if (!a.required && b.required) {
-            return 1
-          }
-          if (a.required && !b.required) {
-            return -1
-          }
-          // then ensure boolean properties are sorted last
-          if (a.type === 'boolean' && b.type !== 'boolean') {
-            return 1
-          }
-          if (a.type !== 'boolean' && b.type === 'boolean') {
-            return -1
-          }
-
-          return 0
-        })
-
-      component.meta.props = component.meta.props.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
-      component.meta.slots = component.meta.slots.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
-      component.meta.exposed = component.meta.exposed.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
-      component.meta.events = component.meta.events.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, true))
+      Object.assign(
+        component.meta,
+        refineMeta(meta, metaFields),
+        {
+          hash: codeHash
+        }
+      )
 
       const extendComponentMetaMatch = code.match(/extendComponentMeta\((\{[\s\S]*?\})\)/);
       const extendedComponentMeta =  extendComponentMetaMatch?.length ? eval(`(${extendComponentMetaMatch[1]})`) : null
       component.meta = defu(component.meta, extendedComponentMeta)
-
-      // Remove descriptional fileds to reduce chunk size
-      removeFields(component.meta, ['declarations'])
 
       components[component.pascalName] = component
     } catch {
@@ -250,6 +213,8 @@ export function useComponentMetaParser (
     }
     const endTime = performance.now()
     if (debug === 2) { logger.success(`${component?.pascalName || component?.filePath || 'a component'} metas parsed in ${(endTime - startTime).toFixed(2)}ms`) }
+
+    return components[component.pascalName]
   }
 
   /**
@@ -283,75 +248,6 @@ export function useComponentMetaParser (
     fetchComponents,
     getStringifiedComponents,
     getVirtualModuleContent
-  }
-}
-
-function removeFields(obj: Record<string, any>, fieldsToRemove: string[]): any {
-  // Check if the obj is an object or array, otherwise return it as-is
-  if (obj && typeof obj === 'object') {
-    // Handle the object and its children recursively
-    for (const key in obj) {
-      // If the key is in fieldsToRemove, delete it
-      if (fieldsToRemove.includes(key)) {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete obj[key];
-      } else if (typeof obj[key] === 'object') {
-        // If the value is an object (or array), recurse into it
-        removeFields(obj[key], fieldsToRemove);
-      }
-    }
-  }
-  return obj;
-}
-
-function stripeTypeScriptInternalTypesSchema (type: any, topLevel: boolean = true): any {
-  if (!type) {
-    return type
-  }
-
-  if (!topLevel && type.declarations && type.declarations.find((d: any) => d.file.includes('node_modules/typescript') || d.file.includes('@vue/runtime-core'))) {
-    return false
-  }
-
-  if (Array.isArray(type)) {
-    return type.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, false)).filter(r => r !== false)
-  }
-
-  if (Array.isArray(type.schema)) {
-    return {
-      ...type,
-      declarations: undefined,
-      schema: type.schema.map((sch: any) => stripeTypeScriptInternalTypesSchema(sch, false)).filter((r: any) => r !== false)
-    }
-  }
-
-  if (!type.schema || typeof type.schema !== 'object') {
-    return typeof type === 'object' ? { ...type, declarations: undefined } : type
-  }
-
-  const schema: any = {}
-  Object.keys(type.schema).forEach((sch) => {
-    if (sch === 'schema' && type.schema[sch]) {
-      schema[sch] = schema[sch] || {}
-      Object.keys(type.schema[sch]).forEach((sch2) => {
-        const res = stripeTypeScriptInternalTypesSchema(type.schema[sch][sch2], false)
-        if (res !== false) {
-          schema[sch][sch2] = res
-        }
-      })
-      return
-    }
-    const res = stripeTypeScriptInternalTypesSchema(type.schema[sch], false)
-
-    if (res !== false) {
-      schema[sch] = res
-    }
-  })
-
-  return {
-    ...type,
-    declarations: undefined,
-    schema
   }
 }
 

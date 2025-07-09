@@ -1,6 +1,8 @@
 import nuxtMetaModule from '../src/module'
 
 export default defineNuxtConfig({
+  css: ['~/assets/css/main.css'],
+
   components: {
     dirs: [
       {
@@ -14,6 +16,7 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/content',
+    '@nuxt/ui-pro',
     nuxtMetaModule as any
   ],
 

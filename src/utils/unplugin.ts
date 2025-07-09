@@ -1,6 +1,6 @@
 import { createUnplugin } from 'unplugin'
-import {  useComponentMetaParser  } from './parser'
-import type {ComponentMetaParser, ComponentMetaParserOptions} from './parser';
+import { useComponentMetaParser } from '../parser/meta-parser'
+import type { ComponentMetaParser, ComponentMetaParserOptions } from '../parser/meta-parser';
 
 type ComponentMetaUnpluginOptions = { parser?: ComponentMetaParser, parserOptions: ComponentMetaParserOptions }
 
