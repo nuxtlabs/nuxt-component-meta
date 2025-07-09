@@ -3,6 +3,7 @@ import type { ComponentMeta } from 'vue-component-meta'
 import { refineMeta } from "./utils"
 import { join } from "pathe"
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs'
+import { withBase } from "ufo"
 
 export interface Options {
   rootDir: string
@@ -18,7 +19,7 @@ export function getComponentMeta(component: string, options?: Options): Componen
     cacheDir: join(rootDir, ".data/cache"),
     ...options
   }
-  const fullPath = join(opts.rootDir, component)
+  const fullPath = withBase(component, opts.rootDir)
   const cachePath = join(opts.cacheDir, `${component}.json`)
 
   if (opts.cache && existsSync(cachePath)) {
@@ -35,7 +36,7 @@ export function getComponentMeta(component: string, options?: Options): Componen
     },
   )
 
-  const meta = checker.getComponentMeta(component)
+  const meta = checker.getComponentMeta(fullPath)
   const refinedMeta = refineMeta(meta)
 
   if (opts.cache) {
