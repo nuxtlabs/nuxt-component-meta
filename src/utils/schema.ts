@@ -1,4 +1,4 @@
-import type { ComponentMeta } from 'vue-component-meta'
+import type { ComponentMeta, PropertyMetaSchema } from 'vue-component-meta'
 import type { JsonSchema } from '../types/schema'
 
 /**
@@ -47,105 +47,115 @@ export function propsToJsonSchema(props: ComponentMeta['props']): JsonSchema {
   return schema
 }
 
-function convertVueTypeToJsonSchema(vueType: string, vueSchema: any): any {
-  // Handle 'any' type
-  if (vueType === 'any') {
-    return {} // JSON Schema allows any type when no type is specified
+function convertVueTypeToJsonSchema(vueType: string, vueSchema: PropertyMetaSchema): any {
+  // Unwrap enums for optionals/unions
+  const { type: unwrappedType, schema: unwrappedSchema, enumValues } = unwrapEnumSchema(vueType, vueSchema)
+  if (enumValues && unwrappedType === 'boolean') {
+    return { type: 'boolean', enum: enumValues }
   }
+  // Handle array with nested object schema FIRST to avoid union logic for array types
+  if (unwrappedType.endsWith('[]')) {
+    const itemType = unwrappedType.replace(/\[\]$/, '').trim()
+    // If the schema is an object with kind: 'array' and schema is an array, use the first element as the item schema
+    // Example: { kind: 'array', type: 'string[]', schema: [ 'string' ] }
+    if (
+      unwrappedSchema &&
+      typeof unwrappedSchema === 'object' &&
+      unwrappedSchema.kind === 'array' &&
+      Array.isArray(unwrappedSchema.schema) &&
+      unwrappedSchema.schema.length > 0
+    ) {
+      const itemSchema = unwrappedSchema.schema[0]
+      return {
+        type: 'array',
+        items: convertVueTypeToJsonSchema(itemSchema.type || itemType, itemSchema)
+      }
+    }
 
-  // Handle union types (e.g., "string | undefined" or "{ foo: string } | undefined")
-  if (vueType.includes(' | ')) {
-    const types = vueType.split(' | ').map(t => t.trim())
-    // Remove undefined and null from the union
-    const nonNullableTypes = types.filter(t => t !== 'undefined' && t !== 'null')
-
-    if (nonNullableTypes.length === 1) {
-      // If only one non-nullable type, use it directly
-      // Special handling: if schema is an enum with numeric keys, extract the schema for the non-undefined type
-      if (
-        vueSchema &&
-        vueSchema.kind === 'enum' &&
-        (vueSchema as any).schema &&
-        typeof (vueSchema as any).schema === 'object' &&
-        Object.keys((vueSchema as any).schema).every(k => !isNaN(Number(k)))
-      ) {
-        // Find the schema for the non-undefined type
-        const matching = Object.values((vueSchema as any).schema).find((s: any) => s.type === nonNullableTypes[0])
-        if (matching) {
-          return convertVueTypeToJsonSchema(nonNullableTypes[0], matching.schema[0] || matching.schema)
+    // If the schema is an object with only key '0', treat its value as the item type/schema
+    // Example: { kind: 'array', type: 'string[]', schema: { '0': 'string' } }
+    if (
+      unwrappedSchema &&
+      typeof unwrappedSchema === 'object' &&
+      'schema' in unwrappedSchema &&
+      (unwrappedSchema as any)['schema'] &&
+      typeof (unwrappedSchema as any)['schema'] === 'object' &&
+      !Array.isArray((unwrappedSchema as any)['schema']) &&
+      Object.keys((unwrappedSchema as any)['schema']).length === 1 &&
+      Object.keys((unwrappedSchema as any)['schema'])[0] === '0'
+    ) {
+      const itemSchema = (unwrappedSchema as any)['schema']['0']
+      // If itemSchema is a string, treat as primitive
+      if (typeof itemSchema === 'string') {
+        return {
+          type: 'array',
+          items: convertSimpleType(itemSchema)
         }
       }
-      return convertVueTypeToJsonSchema(nonNullableTypes[0], vueSchema)
-    } else if (nonNullableTypes.length > 1) {
-      // If multiple non-nullable types, use anyOf
-      return {
-        anyOf: nonNullableTypes.map(t => {
-          if ((t.toLowerCase() === 'object' || t.match(/^{.*}$/))) {
-            if (vueSchema && vueSchema.kind === 'enum' && (vueSchema as any).schema && typeof (vueSchema as any).schema === 'object') {
-              const matching = Object.values((vueSchema as any).schema).find((s: any) => s.type === t)
-              if (matching) {
-                return convertVueTypeToJsonSchema(t, matching.schema as any)
-              }
-            }
+      // If itemSchema is an enum (for union types)
+      if (itemSchema && typeof itemSchema === 'object' && itemSchema.kind === 'enum' && Array.isArray((itemSchema as any)['schema'])) {
+        return {
+          type: 'array',
+          items: {
+            type: (itemSchema as any)['schema'].map((t: any) => typeof t === 'string' ? t : t.type)
           }
-          return convertVueTypeToJsonSchema(t, vueSchema as any)
-        })
+        }
       }
+      // Otherwise, recursively convert
+      return {
+        type: 'array',
+        items: convertVueTypeToJsonSchema(itemType, itemSchema)
+      }
+    }
+    // Fallback: treat as primitive
+    return {
+      type: 'array',
+      items: convertSimpleType(itemType)
     }
   }
 
   // Handle object with nested schema
-  if ((vueType.toLowerCase() === 'object' || vueType.match(/^{.*}$/))) {
+  if (
+    unwrappedType.toLowerCase() === 'object' ||
+    unwrappedType.match(/^{.*}$/) ||
+    (unwrappedSchema && typeof unwrappedSchema === 'object' && unwrappedSchema.kind === 'object')
+  ) {
     // Try to extract nested schema from various possible shapes
     let nested: Record<string, any> | undefined = undefined
-    const vs: any = vueSchema
+    const vs: any = unwrappedSchema
     if (
       vs &&
       typeof vs === 'object' &&
       !Array.isArray(vs) &&
       Object.prototype.hasOwnProperty.call(vs, 'schema') &&
-// @ts-ignore
       vs['schema'] &&
       typeof vs['schema'] === 'object'
     ) {
-// @ts-ignore
       nested = vs['schema'] as Record<string, any>
     } else if (vs && typeof vs === 'object' && !Array.isArray(vs)) {
       nested = vs
     }
     if (nested) {
-      return {
+      const properties = convertNestedSchemaToJsonSchemaProperties(nested as Record<string, any>)
+      // Collect required fields
+      const required = Object.entries(nested)
+        .filter(([_, v]) => v && typeof v === 'object' && v.required)
+        .map(([k]) => k)
+      const schemaObj: any = {
         type: 'object',
-        properties: convertNestedSchemaToJsonSchemaProperties(nested as Record<string, any>),
+        properties,
         additionalProperties: false
       }
+      if (required.length > 0) {
+        schemaObj.required = required
+      }
+      return schemaObj
     }
     // Fallback to generic object
     return { type: 'object' }
   }
-
-  // Handle array with nested object schema
-  if (vueType.endsWith('[]')) {
-    if (typeof vueSchema === 'string') {
-      return {
-        type: 'array',
-        items: convertSimpleType(vueSchema)
-      }
-    }
-    const itemProperties = convertNestedSchemaToJsonSchemaProperties(vueSchema.schema)
-    return {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: itemProperties,
-        required: Object.keys(itemProperties),
-        additionalProperties: false
-      }
-    }
-  }
-
   // Handle simple types
-  return convertSimpleType(vueType)
+  return convertSimpleType(unwrappedType)
 }
 
 function convertNestedSchemaToJsonSchemaProperties(nestedSchema: any): Record<string, any> {
@@ -231,4 +241,68 @@ function parseDefaultValue(defaultValue: string): any {
   } catch {
     return defaultValue
   }
+}
+
+/**
+ * Here are some examples of vueSchema:
+ * 
+ * ```
+ * {
+ *   kind: 'enum',
+ *   type: 'string | undefined', // <-- vueType
+ *   schema: { '0': 'undefined', '1': 'string' }
+ * }
+ * ```
+ * ```
+ * {
+ *   kind: 'enum',
+ *   type: '{ hello: string; } | undefined', // <-- vueType
+ *   schema: {
+ *     '0': 'undefined',
+ *     '1': { kind: 'object', type: '{ hello: string; }', schema: [...] }
+ *   }
+ * }
+ * ```
+ * 
+ * 
+ */
+function unwrapEnumSchema(vueType: string, vueSchema: PropertyMetaSchema): { type: string, schema: any, enumValues?: any[] } {
+  // If schema is an enum with undefined, unwrap to the defined type
+  if (
+    typeof vueSchema === 'object' &&
+    vueSchema?.kind === 'enum' &&
+    vueSchema?.schema && typeof vueSchema?.schema === 'object'
+  ) {
+    // Collect all non-undefined values
+    const values = Object.values(vueSchema.schema).filter(v => v !== 'undefined')
+    // Special handling for boolean enums
+    if (values.every(v => v === 'true' || v === 'false')) {
+      // If both true and false, it's a boolean
+      if (values.length === 2) {
+        return { type: 'boolean', schema: undefined }
+      } else if (values.length === 1) {
+        // Only one value, still boolean but with enum
+        return { type: 'boolean', schema: undefined, enumValues: [values[0] === 'true'] }
+      }
+    }
+    // If only one non-undefined value, unwrap it
+    if (values.length === 1) {
+      const s = values[0]
+      let t = vueType
+      if (typeof s === 'object' && s.type) t = s.type
+      else if (typeof s === 'string') t = s
+      return { type: t, schema: s }
+    }
+    // Otherwise, fallback to first non-undefined
+    for (const s of values) {
+      if (s !== 'undefined') {
+        let t = vueType
+        if (typeof s === 'object' && s.type) t = s.type
+        else if (typeof s === 'string') t = s
+        return { type: t, schema: s }
+      }
+    }
+  }
+
+  return { type: vueType, schema: vueSchema }
 }

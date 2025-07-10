@@ -1,7 +1,7 @@
 import { createCheckerByJson } from "vue-component-meta"
 import type { ComponentMeta } from 'vue-component-meta'
 import { refineMeta } from "./utils"
-import { join } from "pathe"
+import { isAbsolute, join } from "pathe"
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs'
 import { withBase } from "ufo"
 
@@ -19,7 +19,7 @@ export function getComponentMeta(component: string, options?: Options): Componen
     cacheDir: join(rootDir, ".data/cache"),
     ...options
   }
-  const fullPath = withBase(component, opts.rootDir)
+  const fullPath = isAbsolute(component) ? component : withBase(component, opts.rootDir)
   const cachePath = join(opts.cacheDir, `${component}.json`)
 
   if (opts.cache && existsSync(cachePath)) {

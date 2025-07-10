@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { getComponentMeta } from '../src/parser'
-import { propsToJsonSchema } from '../src/utils'
+import { propsToJsonSchema } from '../src/utils/schema'
 import { jsonSchemaToZod } from 'json-schema-to-zod'
 
 describe('ComponentMetaParser', () => {
@@ -93,7 +93,8 @@ describe('ComponentMetaParser', () => {
         }
       },
       "additionalProperties": false,
-      "default": {}
+      "default": {},
+      "required": ["gello"]
     })
 
     expect(jsonSchema.properties?.array).toEqual({
@@ -135,5 +136,28 @@ describe('ComponentMetaParser', () => {
 
     // Since no props are required, the required array should not exist
     expect(jsonSchema.required).toEqual(['name'])
+  })
+
+  test('manual', () => {
+    const meta = getComponentMeta('playground/components/TestD.vue')
+    const result = propsToJsonSchema(meta.props)
+
+    expect(result.properties?.foo).toEqual({
+      description: "FOOOOOO",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    })
+
+    expect(result.properties?.bar).toEqual({
+      "type": "array",
+      "items": {
+        "type": [
+          "string",
+          "number"
+        ]
+      }
+    })
   })
 })
