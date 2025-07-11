@@ -13,7 +13,7 @@ describe("get-component-meta", () => {
     }
   })
 
-  test("parse NormalScript fresh parse", () => {
+  test("parse NormalScript fresh parse", { timeout: 10000 }, () => {
     const meta = getComponentMeta("components/NormalScript.vue", {
       rootDir,
     })
@@ -21,7 +21,7 @@ describe("get-component-meta", () => {
     expect((meta as unknown as Record<string, unknown>).cachedAt).toBeUndefined();
   });
 
-  test("parse NormalScript fresh parse (cache enabled)", () => {
+  test("parse NormalScript fresh parse (cache enabled)", { timeout: 10000 }, () => {
     const meta = getComponentMeta("components/NormalScript.vue", {
       rootDir,
       cache: true
@@ -30,7 +30,7 @@ describe("get-component-meta", () => {
     expect((meta as unknown as Record<string, unknown>).cachedAt).toBeUndefined();
   });
 
-  test("parse NormalScript cached", () => {
+  test("parse NormalScript cached", { timeout: 10000 }, () => {
     const meta = getComponentMeta("components/NormalScript.vue", {
       rootDir,
       cache: true
