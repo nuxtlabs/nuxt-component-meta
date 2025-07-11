@@ -1,8 +1,12 @@
 import type { Component } from '@nuxt/schema'
 import type { ComponentMeta } from 'vue-component-meta'
-import type { ComponentMetaParserOptions } from './parser'
+import type { ModuleOptions } from './module'
 
-export type ComponentData = Omit<Component, 'filePath' | 'shortPath'> & { 
+export type ComponentMetaParserOptions = Omit<ModuleOptions, 'components' | 'metaSources'> & {
+  components: Component[]
+  metaSources?: NuxtComponentMeta
+}
+export type ComponentData = Omit<Component, 'filePath' | 'shortPath'> & {
   meta: ComponentMeta
   fullPath?: string
   filePath?: string,

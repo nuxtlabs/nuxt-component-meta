@@ -1,6 +1,6 @@
 import type { MetaCheckerOptions } from 'vue-component-meta'
 import type { ComponentsDir, ComponentsOptions } from '@nuxt/schema'
-import type { TransformersHookData, ExtendHookData, NuxtComponentMeta } from './types'
+import type { TransformersHookData, ExtendHookData, NuxtComponentMeta } from '.'
 
 export interface ModuleOptions {
   /**

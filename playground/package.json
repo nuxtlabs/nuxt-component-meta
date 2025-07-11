@@ -3,6 +3,7 @@
   "name": "nuxt-component-meta-playground",
   "devDependencies": {
     "@nuxt/content": "^3.6.1",
+    "@nuxt/ui-pro": "^3.2.0",
     "nuxt": "^3.17.6",
     "nuxt-component-meta": "link:.."
   },
@@ -10,5 +11,9 @@
     "dev": "nuxi dev",
     "build": "nuxi build",
     "generate": "nuxi generate"
+  },
+  "dependencies": {
+    "@amoayun/monaco-editor-vue3": "^1.0.20",
+    "monaco-editor": "^0.52.2"
   }
 }
