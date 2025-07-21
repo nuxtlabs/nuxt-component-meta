@@ -27,6 +27,8 @@ export default defineNuxtConfig({
 
 ## Usage
 
+### In Nuxt Applications
+
 ```html
 <template>
   <div>
@@ -42,12 +44,89 @@ const { data: meta } = await useAsyncData('my-component', () => $fetch('/api/com
 </script>
 ```
 
+### Standalone Usage with `getComponentMeta`
+
+You can also use the `getComponentMeta` utility directly to extract component metadata programmatically:
+
+```ts
+import { getComponentMeta } from 'nuxt-component-meta'
+
+// Basic usage
+const meta = getComponentMeta('components/MyComponent.vue')
+
+// With options
+const meta = getComponentMeta('components/MyComponent.vue', {
+  rootDir: '/path/to/project',
+  cache: true,
+  cacheDir: '.component-meta-cache'
+})
+
+// Access component metadata
+console.log(meta.props)    // Component props
+console.log(meta.slots)    // Component slots  
+console.log(meta.events)   // Component events
+console.log(meta.exposed)  // Exposed properties
+```
+
+#### Options
+
+- `rootDir` - Project root directory (defaults to `process.cwd()`)
+- `cache` - Enable caching to improve performance (defaults to `false`)
+- `cacheDir` - Directory for cache files (defaults to `.data/nuxt-component-meta`)
+
+### Schema Generation with `propsToJsonSchema`
+
+The `propsToJsonSchema` utility converts Vue component props metadata into JSON Schema format, enabling validation and type checking:
+
+```ts
+import { getComponentMeta, propsToJsonSchema } from 'nuxt-component-meta'
+
+// Get component metadata
+const meta = getComponentMeta('components/MyComponent.vue')
+
+// Convert props to JSON Schema
+const jsonSchema = propsToJsonSchema(meta.props)
+
+console.log(jsonSchema)
+// Output:
+// {
+//   "type": "object",
+//   "properties": {
+//     "title": { "type": "string", "description": "Component title" },
+//     "count": { "type": "number", "default": 0 },
+//     "enabled": { "type": "boolean", "default": true }
+//   },
+//   "required": ["title"]
+// }
+```
+
+#### Integration with Validation Libraries
+
+The generated JSON Schema can be used with popular validation libraries:
+
+```ts
+import { jsonSchemaToZod } from 'json-schema-to-zod'
+import Ajv from 'ajv'
+
+// With Zod
+const zodString = jsonSchemaToZod(jsonSchema)
+const zodSchema = eval(zodString)
+const result = zodSchema.safeParse(componentProps)
+
+// With AJV
+const ajv = new Ajv()
+const validate = ajv.compile(jsonSchema)
+const isValid = validate(componentProps)
+```
+
 ## Nightly Builds
 
-You can install the latest nightly build of the Studio module by running:
+This module uses [pkg.pr.new](https://pkg.pr.new) for continuous releases. Each commit to the main branch automatically publishes a new version with its own unique URL, allowing you to test the latest changes before they're officially released.
+
+You can install a specific commit using its unique URL:
 
 ```bash
-npm i nuxt-component-meta@nightly
+npm i https://pkg.pr.new/nuxtlabs/nuxt-component-meta@<commit-hash>
 ```
 
 <!-- Badges -->
