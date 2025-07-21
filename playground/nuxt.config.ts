@@ -45,6 +45,12 @@ export default defineNuxtConfig({
     ]
   },
 
+  content: {
+    experimental: {
+      sqliteConnector: 'native'
+    }
+  },
+
   typescript: {
     includeWorkspace: true
   },
