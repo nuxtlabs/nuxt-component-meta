@@ -49,7 +49,7 @@ const { data: meta } = await useAsyncData('my-component', () => $fetch('/api/com
 You can also use the `getComponentMeta` utility directly to extract component metadata programmatically:
 
 ```ts
-import { getComponentMeta } from 'nuxt-component-meta'
+import { getComponentMeta } from 'nuxt-component-meta/parser'
 
 // Basic usage
 const meta = getComponentMeta('components/MyComponent.vue')
@@ -79,7 +79,8 @@ console.log(meta.exposed)  // Exposed properties
 The `propsToJsonSchema` utility converts Vue component props metadata into JSON Schema format, enabling validation and type checking:
 
 ```ts
-import { getComponentMeta, propsToJsonSchema } from 'nuxt-component-meta'
+import { getComponentMeta } from 'nuxt-component-meta/parser'
+import { propsToJsonSchema } from 'nuxt-component-meta/utils'
 
 // Get component metadata
 const meta = getComponentMeta('components/MyComponent.vue')
