@@ -3,7 +3,7 @@ import {
   createResolver,
   logger
 } from '@nuxt/kit'
-import type { NuxtComponentMeta } from './types'
+import type { NuxtComponentMeta } from '../types'
 
 // Resolve external components definitions
 export async function loadExternalSources (sources: (string | Partial<NuxtComponentMeta>)[] = []) {
