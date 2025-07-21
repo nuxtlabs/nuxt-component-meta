@@ -21,11 +21,11 @@ export function getComponentMeta(component: string, options?: Options): Componen
     ...options
   }
   const fullPath = isAbsolute(component) ? component : withBase(component, opts.rootDir)
-  let cachePath = join(opts.cacheDir, `${component}.json`)
+  let cachePath = undefined
   if (opts.cache) {
     try {
       const content = readFileSync(fullPath, { encoding: 'utf8', flag: 'r' })
-      const cacheId = component.split('/').pop()?.replace(/\./g, '_') + '-' + hash('sha1', content).slice(0, 12)
+      const cacheId = component.split('/').pop()?.replace(/\./g, '_') + '--' + hash('sha1', content).slice(0, 12)
       cachePath = join(opts.cacheDir, `${cacheId}.json`)
     } catch (error) {
       throw new Error(`Error reading file ${fullPath}: ${error}`)
@@ -36,6 +36,27 @@ export function getComponentMeta(component: string, options?: Options): Componen
     }
   }
 
+  const componentMeta = _getComponentMeta(fullPath, opts)
+
+  if (cachePath) {
+    const cache = JSON.stringify({ cachedAt: Date.now(), ...componentMeta })
+    if (!existsSync(opts.cacheDir)) {
+      mkdirSync(opts.cacheDir, { recursive: true })
+    }
+    writeFileSync(cachePath, cache, { encoding: 'utf8', flag: 'w' })
+  }
+
+  return componentMeta
+}
+
+/**
+ * Create new checker and get component meta
+ *
+ * @param fullPath full path of the component
+ * @param opts options
+ * @returns component meta
+ */
+function _getComponentMeta(fullPath: string, opts: Options) {
   const checker = createCheckerByJson(
     opts.rootDir,
     {
@@ -45,20 +66,7 @@ export function getComponentMeta(component: string, options?: Options): Componen
       exclude: []
     },
   )
-
-  const meta = checker.getComponentMeta(fullPath)
-  const refinedMeta = refineMeta(meta)
-
-  if (opts.cache) {
-    const cache = JSON.stringify({
-      cachedAt: Date.now(),
-      ...refinedMeta,
-    })
-    if (!existsSync(opts.cacheDir)) {
-      mkdirSync(opts.cacheDir, { recursive: true })
-    }
-    writeFileSync(cachePath, cache, { encoding: 'utf8', flag: 'w' })
-  }
-
-  return refinedMeta
+  return refineMeta(
+    checker.getComponentMeta(fullPath)
+  )
 }
