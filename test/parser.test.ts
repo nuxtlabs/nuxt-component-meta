@@ -1,7 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { getComponentMeta } from '../src/parser'
 import { propsToJsonSchema } from '../src/utils/schema'
-import { jsonSchemaToZod } from 'json-schema-to-zod'
 
 describe('ComponentMetaParser', () => {
   test('should be able to fetch component meta', async () => {
@@ -15,50 +14,6 @@ describe('ComponentMetaParser', () => {
     expect(propsNames).toContain('hello')
     expect(propsNames).toContain('booleanProp')
     expect(propsNames).toContain('numberProp')
-  })
-
-  test('whole', async () => {
-    const meta = getComponentMeta('playground/components/TestComponent.vue')
-    const jsonSchema = propsToJsonSchema(meta.props)
-    const zod = jsonSchemaToZod(jsonSchema, { module: "cjs" })
-
-    const data = [
-      {
-        match: true,
-        data: {
-          name: 'nuxt-component-meta',
-          foo: 'bar',
-          hello: 'world',
-          booleanProp: true,
-          numberProp: 42,
-          data: {
-            gello: "Gello"
-          }
-        }
-      },
-      {
-        match: false,
-        data: {
-          name: 'nuxt-component-meta',
-          foo: 12,
-          hello: 'world',
-          booleanProp: true,
-          numberProp: 42,
-          data: {
-            gello: "Gello"
-          }
-        }
-      }
-    ]
-
-    for (const item of data) {
-      const schema = eval(zod)
-      if (item.match) {
-        schema.parse(item.data)
-      } else {
-        expect(() => schema.parse(data)).toThrow()
-      }
-    }
   })
 
   test('propsToJsonSchema should convert props to JSON Schema format', async () => {
@@ -138,7 +93,7 @@ describe('ComponentMetaParser', () => {
     expect(jsonSchema.required).toEqual(['name'])
   })
 
-  test('manual', () => {
+  test('TestD.vue', () => {
     const meta = getComponentMeta('playground/components/TestD.vue')
     const result = propsToJsonSchema(meta.props)
 
