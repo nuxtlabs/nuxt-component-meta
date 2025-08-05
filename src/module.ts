@@ -43,6 +43,7 @@ export default defineNuxtModule<ModuleOptions>({
       'nuxt/dist/app/components/nuxt-loading-indicator',
       'nuxt/dist/app/components/nuxt-route-announcer',
       'nuxt/dist/app/components/nuxt-stubs',
+      (component) => component.filePath.endsWith('.svg')
     ],
     include: [],
     metaFields: {
